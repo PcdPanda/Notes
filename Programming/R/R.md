@@ -1,6 +1,6 @@
 [toc]
 
-[环境配置]([Using RStudio Server in Windows WSL2 – RStudio Support](https://support.rstudio.com/hc/en-us/articles/360049776974-Using-RStudio-Server-in-Windows-WSL2))
+[环境配置](https://support.rstudio.com/hc/en-us/articles/360049776974-Using-RStudio-Server-in-Windows-WSL2)
 
 # 1. 基本操作
 
