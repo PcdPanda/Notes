@@ -1,5 +1,5 @@
 [toc]
-# 1. Overview
+# 1. [Overview]([15-418/15-618: Parallel Computer Architecture and Programming, Fall 2019: Schedule](https://www.cs.cmu.edu/afs/cs/academic/class/15418-f19/www/schedule.html))
 ### 1.1 Objectives of Parallelism Design
 ##### Hardware Design
 - 自动识别并行优化指令
@@ -230,3 +230,52 @@
 - 设计两个调度模式,粗颗粒度和细颗粒度
 - 当task数大于thread数时,分配颗粒度较粗,提高每个thread的运行效率
 - 当thread数大于task时,分配颗粒度较细,增加task数量,减少idle的thread
+
+### 5.5 Communication
+
+##### 通信分类
+
+- 通信模式
+
+  - 同步通信: 场景简单,但是需要设计精巧地模型(例如interleave model)
+
+  - 异步通信: 场景众多,通过回调函数方式实现
+
+- 通信原由
+  - Inherent communication: 取决于算法
+  - Artifactual communication: 取决于计算机运行机制,cache的设计逻辑,cache line大小等
+
+##### 吞吐量
+
+传输$n$大小的数据,则有$T(n)=T_0+T_1+\frac{n}{b}$
+
+- 传输延时$T_0$: 准备buffer等耗时
+- 网络延时$T_1$: 数据传输的时间,由距离和传输速度决定
+- 传输带宽 $b$: 把数据送到链路的时间,由位宽和数据量决定
+
+$T_0,T_1$的延时可以通过pipeline隐藏,<u>通常带宽最终成为瓶颈</u>
+
+##### 计算通信比和局部性优化
+
+$$
+\text{Arithmetic intensity}=\frac{i\text{(instructions)}}{n\text{(bytes)}}
+$$
+
+- 合理分配每个核心处理的数据和逻辑,通过<u>优化局部性提高计算通信比</u> (思考grid solver的分配逻辑)
+- 根据cache的访问逻辑,调整程序的运行逻辑,<u>使得每次load cache可以处理尽可能多的数据</u>
+- 根据程序的逻辑,重新排列数据,尽可能<u>连续访问</u>地址 (思考block partition粒子)
+
+### 5.6 Contention
+
+##### 饥饿
+
+随着任务数量的增加,每个任务的等待延时会无限增长,容易造成饥饿
+
+- Appointment: 实现逻辑复杂
+- Tree structure: 每一个thread有上一级的thread来处理,结果是数据更新缓慢
+- Flat: 无竞争时速度快,有竞争时容易饥饿
+
+##### 优化
+
+- 细分共享资源,减少同一资源的并发量 (思考分布式队列和子列表)
+- 对输入数据预先排序,从有序性中减少共享资源的访问次数
