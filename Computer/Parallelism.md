@@ -81,6 +81,108 @@
 - 需要提供复杂的算符,来实现kernel间的计算
 # 4. GPU Parallelism
 
+### 4.1 基本原理
+
+##### 硬件架构
+
+- 有上千个Core
+- 每个Core有独立的Shared Memory和L1 Cache,可以负责执行多个Block
+- 每个Core中有Warp,对应执行相同Kernel的若干个Thread
+- 每个Core有大量执行单元执行SIMD,对Warp数据施加相同的计算逻辑
+
+##### 图形渲染流程
+
+1. 定义并用顶点描述一个需要渲染的实体
+2. 根据展现实体的视角变换像素点
+3. 根据实体的特征和视角,将实体分片
+4. <u>对每个分片进行并行的pipeline计算</u>
+5. 对分片上色,并拼接组合
+
+##### 显存架构
+
+- 全局GPU memory (GB level)
+- 全局L2 Cache (MB level)
+- Core中的L1 Cache (KB level)
+- Warp中的寄存器和L0 Cache (Byte level)
+
+### 4.2 CUDA编程架构
+
+##### CUDA术语
+
+- <u>Kernel</u>:在每个thread上执行计算的函数
+
+- Host: CPU端
+- Device: GPU端
+
+##### CUDA并行逻辑和内存
+
+|          | Grid                                                         | Block                                              | Thread                |
+| -------- | ------------------------------------------------------------ | -------------------------------------------------- | --------------------- |
+| 功能     | 运行整个计算的单位                                           | 包含多个Thread,是<u>系统调度的最小单位</u>         | 执行kernel的基本单位  |
+| 硬件映射 | 整个GPU                                                      | 流处理器                                           | Warp                  |
+| 内存     | Global Memory                                                | Shared Memory, L1 Cache                            | register,L0           |
+| 内存特性 | Host端调用gpu malloc分配,保存输入和输出,所有thread都可以访问 | 由block内每个线程的kernel申请,只有这些线程可以访问 | 保存thread的local var |
+
+##### 调度逻辑
+
+- 以block为单位调度,确保每个block内的线程可以高效访问共享内存
+- 动态调度,当有空闲的核心时,就分配block
+- 不同block可能以任意顺序执行,因此相互之间不应该有依赖
+- 同一个block内的thread,同时执行每一条指令
+
+### 4.3 程序设计
+
+1. 分配block和thread
+
+   - Block之间逻辑应当相互独立
+   - thread之间可以有依赖,通过同步实现,同时共享block的数据
+
+   ```c++
+   const int Nx = 1024, Ny = 1;
+   dim3 threadsPerBlock(32, 1, 1); // 定义每个block中有32个线程
+   dim3 numBlocks(Nx/threadsPerBlock.x, Ny/threadsPerBlock.y, 1); 
+   // grid中x维度有32个block,y维度有1个block,一共32个block
+   
+   ```
+
+2. 分配全局显存并转移数据
+
+   ```c++
+   int N = 1024
+   // 在GPU中分配显存
+   cudaMalloc(&devInput, sizeof(float) * (N+2));  
+   cudaMalloc(&devOutput, sizeof(float) * N);     
+   ```
+
+3. 定义kernel函数 (SPMD执行SIMD)
+
+   - kernel中可以得到thread和block坐标,从而做针对性计算,<u>不适合复杂逻辑</u>
+   - 需要注意每个block申请的共享内存,和每个流处理器的共享内存,尽可能让每个流处理器用足shared memory
+
+   ```c++
+   __global__ void convolve(int N, float* input, float* output) {
+       // 每个thread在block中申请内存,block内其他线程都可以访问
+       __shared__ float support[THREADS_PER_BLK+2];    
+       // 从输入中读取自己负责的数据,导入到block内
+       int index = blockIdx.x * blockDim.x + threadIdx.x;  
+       support[threadIdx.x] = input[index];
+       // 卷积运算需要额外导入两次
+       if (threadIdx.x < 2) {
+       	support[THREADS_PER_BLK + threadIdx.x] = input[index+THREADS_PER_BLK]; 
+       }
+       // 等block内所有线程都导入完成后再开始计算
+       __syncthreads();
+       float result = 0.0f;  // 线程执行计算
+       for (int i=0; i<3; i++)   
+       result += support[threadIdx.x + i];
+       output[index] = result / 3.f; // 输出到全局内存
+   }
+   // 并行执行kernel
+   convolve<<<N/THREADS_PER_BLK, THREADS_PER_BLK>>>(N, devInput, devOutput); 
+   ```
+
+   
+
 # 5. Programming Model
 ### 5.1 基本概念
 ##### Abstraction (Single Program Multiple Data)
