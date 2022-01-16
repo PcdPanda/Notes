@@ -120,7 +120,7 @@
 | -------- | ------------------------------------------------------------ | -------------------------------------------------- | --------------------- |
 | 功能     | 运行整个计算的单位                                           | 包含多个Thread,是<u>系统调度的最小单位</u>         | 执行kernel的基本单位  |
 | 硬件映射 | 整个GPU                                                      | 流处理器                                           | Warp                  |
-| 内存     | Global Memory                                                | Shared Memory, L1 Cache                            | register,L0           |
+| 内存     | Global Memory, L2 Cache                                      | Shared Memory, L1 Cache                            | register,L0           |
 | 内存特性 | Host端调用gpu malloc分配,保存输入和输出,所有thread都可以访问 | 由block内每个线程的kernel申请,只有这些线程可以访问 | 保存thread的local var |
 
 ##### 调度逻辑

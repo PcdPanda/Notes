@@ -418,19 +418,31 @@ $$
 
 相当于特殊情况下的gamma和weibull分布
 
-| 参数                          | 期望    | 方差      |
-| ----------------------------- | ------- | --------- |
-| 参数 $\beta$(等同于$\lambda$) | $\beta$ | $\beta^2$ |
+| 参数      | 期望      | 方差                  |
+| --------- | --------- | --------------------- |
+| $\lambda$ | $\lambda$ | $\frac{1}{\lambda^2}$ |
 
 $$
-f_X(x)=\frac{1}{\beta}e^{-x/\beta}
+f_X(x)=\lambda e^{-\lambda x}
 $$
 
 ##### <u>指数分布无记忆性</u>
 
 $P[t\geq x]=e^{-x/\beta}\rightarrow P[t\geq K+x|t\geq K]=\frac{e^{-(x+K)/\beta}}{e^{-K/\beta}}=e^{-x/\beta}$
 
-### 3.5 Chi-Square Distribution
+### 3.5 双指数分布(Laplace Distribution)
+
+由对称的指数分布获得
+
+| 参数          | 期望  | 方差                  | 偏度 | 峰读 |
+| ------------- | ----- | --------------------- | ---- | ---- |
+| $\lambda,\mu$ | $\mu$ | $\frac{1}{\lambda^2}$ | 0    | 3    |
+
+$$
+f(x)=\frac{\lambda}{2}e^{-\lambda|x-\mu|}
+$$
+
+### 3.6 Chi-Square Distribution
 
 描述$n$个标准正态分布变量<u>平方和的分布</u>,相当于$\alpha=n/2,\beta=2$的gamma 分布
 
@@ -448,7 +460,7 @@ $$
 f_{\chi_n^2}= \frac{1}{\Gamma(n/2)2^{n/2}}x^{n/2-1}e^{-x/2}
 $$
 
-### 3.6 T-Distribution
+### 3.7 T-Distribution
 
 描述标准正态分布变量和$n$度卡方分布变量联合关系
 
@@ -466,7 +478,7 @@ $$
 
 <div STYLE="page-break-after: always;"></div>
 
-### 3.7 F-Distribution
+### 3.8 F-Distribution
 
 描述两个不同自由度Chi-square Distribution变量的关系
 

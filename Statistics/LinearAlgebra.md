@@ -415,9 +415,69 @@ $v_{r+1},v_{r+2}\cdots v_{n}$是零空间中的标准正交基
 
 $u_{r+1},u_{r+2}\cdots u_{m}$是左零空间的标准正交基
 
-# 5. 线性代数应用
+# 5. 矩阵求导
 
-### 5.1 图论
+### 5.1 重要矩阵
+
+给定$f(\vec x)$,导数矩阵说明了$f$在$\vec x$的性质 
+
+##### 梯度
+
+- 函数值上升最快的方向
+
+  $\bigtriangledown f(\vec x)=\begin{bmatrix}\frac{\partial f}{\partial x_1}\\\frac{\partial f}{\partial x_2}\\\cdots\\\frac{\partial f}{\partial x_n}\end{bmatrix}$
+
+##### 海森矩阵(Hessian)
+
+- $f$在$\vec x$处的二阶导,标志梯度的每个分量变化速度快慢
+
+  $\frac{\partial^2f(\vec x)}{\partial \vec x\partial \vec x^T}=\begin{bmatrix}\frac{\partial^2f}{\partial x_1^2}&\frac{\partial^2f}{\partial x_1\partial x_2}&\cdots&\frac{\partial^2f}{\partial x_1\partial x_n}\\\frac{\partial^2f}{\partial x_2\partial x_1}&\frac{\partial^2f}{\partial x_2^2}&\cdots&\cdots\\\cdots&\cdots&\cdots&\cdots\\\frac{\partial^2f}{\partial x_nx_1}&\cdots&\cdots&\frac{\partial^2f}{\partial x_n^2}\end{bmatrix}$
+
+##### 雅各比矩阵(Jacobian)
+
+- <u>矩阵函数</u>$f\in\R^{n\times m}$在$\vec{x}$的导数
+- $\textbf{J(f)}=\begin{bmatrix}\frac{\partial f_1}{\partial x_1}&\cdots&\frac{\partial f_1}{\partial x_n}\\\cdots & \cdots&\cdots\\\frac{\partial f_m}{\partial x_1}&\cdots&\frac{\partial f_m}{\partial x_n}\end{bmatrix}$
+
+
+
+### 5.2 标量对矩阵求导
+
+标量对自变量$X$中的每个元素求导,得到的向量/矩阵$f'$和自变量$X$<u>的维度</u>一致
+
+<u>导数只有转置以后才可以乘以</u>$X$
+
+##### 标量对向量求导
+
+- 根据梯度$\bigtriangledown f(x,y)=\frac{\partial f}{\partial x}\mathrm dx + \frac{\partial f}{\partial y}\mathrm dy$
+
+- 用向量$X$表示$(x,y)$,则有$f(X)'=\frac{\mathrm df^T}{\mathrm dX}\mathrm dX$
+- 已知标量为两个矩阵的乘积
+  - $\frac{\partial \beta^Tx}{\partial x}=\beta$
+  - $\frac{\partial x^Tx}{\partial x}=2x$
+  - $\frac{\partial x^TAx}{\partial x}=(A+A^T)x$
+
+##### 标量对矩阵求导
+
+1. 令$X$为矩阵,各列为向量,则有$f(X)’=\sum_{i=0}^c\frac{\mathrm df^T}{\mathrm dX_c}\mathrm dX_c$
+
+2. 根据矩阵内积定义 $\tr(A^TB)=\sum_{i,j}A_{ij}B_{ij}$ (所有元素乘积求和)
+3. $f(X)'=\tr(\frac{\mathrm d f^T}{\mathrm dX}\mathrm d X)$
+
+### 5.3 向量对矩阵求导
+
+把列向量的每个元素视为标量,再求导分解
+$$
+\frac{\partial Y}{\partial X}=\begin{bmatrix}
+\frac{\partial y_1}{\partial x_1} & \frac{\partial y_1}{\partial x_2} & \cdots & \frac{\partial y_1}{\partial x_n}\\
+\cdots & \cdots & \cdots & \cdots\\
+\frac{\partial y_m}{\partial x_1} & \frac{\partial y_m}{\partial x_2} & \cdots & \frac{\partial y_m}{\partial x_n}
+\end{bmatrix}
+$$
+
+
+# 6. 线性代数应用
+
+### 6.1 图论
 
 给定每条边的势能差,可以计算每个点势能
 
@@ -502,7 +562,7 @@ i_4+i_5
 $$
 $\dim{y}$描述了通量中的环的数量
 
-### 5.2 级数
+### 6.2 级数
 
 ##### 幂级数
 
@@ -531,7 +591,7 @@ $f\cdot g=\int_0^{2\pi} f(x)g(x)\mathrm{d}x$
 
 通过点积求系数$a_1=\frac{\int_0^{2\pi}f(x)\cos x\mathrm{d}x}{f_0^{2\pi}\cos^2x\mathrm{d}x}$
 
-### 5.3 解微分方程
+### 6.3 解微分方程
 
 给定矩阵$A$,求解$\frac{\mathrm{d}u}{\mathrm{d}t}=Au$
 
@@ -559,7 +619,7 @@ $f\cdot g=\int_0^{2\pi} f(x)g(x)\mathrm{d}x$
 
 - 小于0的$\lambda_i$的项最终会消失
 
-### 5.4 马尔科夫转换
+### 6.4 马尔科夫转换
 
 ##### 定义
 
@@ -584,7 +644,7 @@ $$
   - 求解$(A-I)v=0$,则可以得到对应的特征向量
   - 对应的$v$决定了稳态
 
-### 5.5 信号压缩
+### 6.5 信号压缩
 
 ##### 基本概念
 
