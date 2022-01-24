@@ -117,19 +117,26 @@ n位内存地址被分为3部分
 - T(tag):cache保存的标识符,标志是否是想要的block
 - S(set):决定该block保存在哪个cache set中
 
-- B(block)地址: 如果T和S相同,则所有block都会被放入cache
+- B(block)地址: 对应T和S下的所有block都会被放入cache
 
 cache有$2^S$个set,每个set里可以放$E$个block(E ways of associative)
 
 写入策略: 先把数据load进cache再写入. block被置换的时候,再写入磁盘
 
-#### 基本架构
+##### 基本架构
 
 | 用途   | L1 Data | L1 Instruction | TLB L1 Data | TLB L1 Instruction | L2                | TLB L2    | L3         |
 | ------ | ------- | -------------- | ----------- | ------------------ | ----------------- | --------- | ---------- |
 | 使用者 | 单个CPU | 单个CPU        | MMU         | MMU                | 单个处理器(2 CPU) | MMU       | 单个Socket |
 | 大小   | 32KB    | 32KB           | 64 Entry    | 128 Entry          | 256KB             | 512 Entry | 8MB        |
 | Way    | 8       | 8              | 4           | 4                  | 8                 | 4         | 16         |
+
+##### Write pattern
+
+- Write-back: 每次write只会写在cache里,evict的时候才会更新memory
+- Write-through: 每次write都会直接更新memory
+- Write-allocate: write完成后,会load cache line到cache
+- Write-not-allocate: write发生cache miss时不会load cache line到cache
 
 ### 2.4 内存
 

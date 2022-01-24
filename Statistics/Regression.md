@@ -196,119 +196,175 @@ $$
 3. 对于每个模型,计算$C_p=\frac{SSE_p}{MSE_k}+2p-n$
 4. 选择$C_p$最小的模型,或者和$p$最接近的模型
 
-# 2. 逻辑回归
-
-### 2.1 基本概念
-
-##### 输入输出
-
-- 测试集输入是$k$维的实数向量x,输出是对应的<u>二分类结果</u>$y$,表示该样本为正例的概率 (伯努利分布的$\mu$)
-
-- 训练集的输入是$k$维的实数向量,标签是离散分类结果$\{0,1\}$
-
-- 样本标签的伯努利分布属于canonical exponential family
-  $$
-  f(y)=\exp[y\ln\frac{p}{1-p}+\ln (1-p)]=\exp(y\theta-\ln(1+e^\theta))
-  $$
-
-  - $b'(\theta)=\frac{e^\theta}{1+e^{\theta}}$
-
-  - canonical link:  $g(\mu)=\ln\frac{\mu}{1-\mu}$
-
-##### 决策模型
-
-- 逻辑回归<u>用线性变量$X^T\beta$寻找伯努利变量$Y$落在不同类别的对数概率</u>$\ln\frac{p}{1-p}$
-- 用伯努利canonical link作为GLM的link function带入则有$\theta=\ln\frac{p}{1-p}=X^T\beta$
-- 根据GLM link function定义,可以得到预测值$y=g^{-1}(X^T\beta)=\frac{1}{1+\exp[-(X^T\beta)]}$
-
-- 在$R$维空间中,寻找一条直线$X^T\beta=0$,基于$x$存在的位置,决定输出
-
-### 2.2 训练和计算流程
-
-本质上是找到最优解$\beta$来表示$\theta$从而最大似然函数
-
-1. 给定$n$个样本$x_i\in\mathbb{R_k}$和分类结果$y_i\in\{0,1\}$
-2. 每次分类的对数似然函数为$l(y,x;\beta)=yx^T\beta-\ln(1+\exp(x^T\beta))$
-
-3. 对所有样本进行极大似然估计$l_n(y,x;\beta)=\sum(y_ix_i^T\beta-\ln(1+\exp(x_i^T\beta)))$
-4. 使用牛顿法/梯度下降方法求得最优解$\beta^*$
 
 
-
-# 3. Generalize Linear Model (GLM)
+# 2. Generalize Linear Model (GLM)
 
 本质上用线性变换$X^T\beta$来估计$Y$分布的参数$\theta$,从而获得$Y$在特定$X$下的分布
 
-### 3.1 松弛条件
+### 2.1 Exponential Distribution Family
 
-##### Y Canonical Exponential Family
+##### Exponential Family
 
-得到的$Y$最终服从canonical exponential family
+可以化简指数项和特定函数乘积的分布
 
-- $f_\theta(y)=\exp[\frac{y\theta-b(\theta)}{\phi} + c(y,\phi)]$
+| $x$      | $\theta$ | $\eta,T,B,h$       |
+| -------- | -------- | ------------------ |
+| 随机变量 | 分布参数 | 构造分布的特殊函数 |
+
+
+$$
+f_\theta(x)=\exp[\sum\eta(\theta)T(x)-B(\theta)]h(x)
+$$
+
+##### Canonical Exponential Family
+
+指数分布族的子集,$x$前的系数不是$\eta$而是$\theta$自身
+
+| $x$      | $\theta$     | $\phi$                      | $b,c$              |
+| -------- | ------------ | --------------------------- | ------------------ |
+| 随机变量 | 未知分布参数 | 已知的分布参数,可以当做常数 | 构造分布的特殊函数 |
+
+
+$$
+f_\theta(x)=\exp[\frac{x\theta-b(\theta)}{\phi}+c(x, \phi)]
+$$
+
+##### Canonical分布族特性
+
+通过函数$b(\theta)$可以获得关于变量的重要特性
+
+- $E[X]=b'(\theta)$
+- $VAR[X]=b''(\theta)\phi$
+- <u>因为方差恒大于0,所以$b'(\theta)$单调递增,且$b(\theta)$是凸函数</u>
+
+### 2.2 松弛条件
+
+GLM本质上用线性回归输出值$X^TB$来估计$Y$分布的参数$\hat\theta$,再根据$g$是$b'^{-1}$反函数的性质,用来估计$Y$的输出值
+
+##### 回归值分布
+
+- 服从canonical exponential family: $f_\theta(y)=\exp[\frac{y\theta-b(\theta)}{\phi} + c(y,\phi)]$
+
 - 预测结果期望 $E[Y]=b'(\theta)$
 - 预测结果方差 $VAR[Y]=b''(\theta)$
 
-##### link function
+##### link function ($g$)
 
-- $g$将$Y$的均值和线性变化后的$X^TB$连接起来
+- 将$Y$的均值和线性变化后的$X^TB$连接起来 $g(\hat{\mu_Y|x})=X^TB$
+- <u>是$Y$分布的$b'$反函数,即$g(\mu_Y|x)=X^T\beta$,则单调且可逆</u>
 
-- $g(\hat{\mu_Y|x})=X^TB$
-- 必须单调且可逆
-- 尽量使得$g$是$b'$的反函数,即可以通过线性模型获得$Y$的分布参数$\theta=X^T\beta$
-
-### 3.2 计算流程
+### 2.3 计算流程
 
 ##### 计算流程
 
-1. 给定数据,假设$y$的均值分布$f_\theta(y)$以及和$X$的关系$g(X^T\beta)$
-2. 根据GLM和Canonical的定义$h(X^T\beta)=b'^{-1}(g^{-1}(X^T\beta))$
-3. 使用极大似然估计,求导后的似然函数$L=\sum Y_ih(X_i^T\beta)-b(h(X_i^T\beta))$
-4. 因为$b$是convex的,所以$L$一定有最大值
-5. 使用最优化方法求极值$\beta^*$
+1. 根据$y$的先验分布模型,构造$\theta=h(X^T\beta)=b'^{-1}(g^{-1}(X^T\beta))$
+   - 通常$g$和$b'$互为反函数,则$h(x)=x$
+2. 使用极大似然估计,构造对数似然函数$L=\sum f_Y(y;h(X^T\beta))$
 
-$\tilde Y=\left[\begin{array}{c}g'(\mu_1)Y_1&g'(\mu_2)Y_2&\cdots&g'(\mu_n)Y_n  \end{array}\right]^T$
+3. 因为$b$是convex的,所以$L$一定有最大值
 
-$\tilde\mu=\left[\begin{array}{c}g'(\mu_1)\mu_1&g'(\mu_2)\mu_2&\cdots&g'(\mu_n)\mu_n\end{array}\right]^T$
+4. 使用最优化方法求极值$\beta^*$
 
-$W_i=\frac{h'(X_i^T\beta)}{g'(\mu_i)\phi}$
+##### 迭代优化法
 
-$W=\text{diag}\{W_1,\cdots,W_n\}$
+1. 根据$y$的分布构造矩阵 
+   $$
+   W=\text{diag}\{W_1,\cdots,W_n\}\quad\text{where}\quad W_i=\frac{h'(X_i^T\beta)}{g'(\mu_i)\phi}
+   $$
 
-$\beta^{k+1}=(X^TWX)^{-1}X^TW(\tilde Y-\tilde\mu+X\beta^{k})$
+2. 根据样本生成估计值和实际值
+   - 实际值: $\tilde Y=\left[\begin{array}{c}g'(\mu_1)Y_1&g'(\mu_2)Y_2&\cdots&g'(\mu_n)Y_n  \end{array}\right]^T$
+   - 估计值: $\tilde\mu=\left[\begin{array}{c}g'(\mu_1)\mu_1&g'(\mu_2)\mu_2&\cdots&g'(\mu_n)\mu_n\end{array}\right]^T$
 
-##### 牛顿法迭代求极值
+3. 迭代更新直到收敛
+   $$
+   \beta^{k+1}=(X^TWX)^{-1}X^TW(\tilde Y-\tilde\mu+X\beta^{k})
+   $$
 
-1. 假设下一个迭代点$\theta^{k+1}$是最优解,即梯度为0, $\bigtriangledown_L(\theta^{k+1})=0$
-2. 对这个迭代点和上一个迭代点的导数进行二阶泰勒展开$\bigtriangledown_L(\theta^{k+1})=\bigtriangledown_L(\theta^{k})+(\theta^{k+1}-\theta^k)H_L(\theta^k)$
-3. 带入假设,可以得到迭代方程: $\theta^{k+1}=\theta^k-H_L(\theta^k)^{-1}\bigtriangledown_L(\theta^{k})$
-4. 如果二阶导矩阵$H_L$很难计算,则可以用数据点中的fisher information $-I(\theta^k)$代替
-5. $\theta^{k+1}=\theta^k+I(\theta^k)^{-1}\bigtriangledown_L(\theta^{k})$
+4. 
 
-### 3.3 指数拟合
+### 2.4 线性(正态分布)回归应用
 
-##### 基本定义
+##### 输出
 
-- $\hat y=\beta_0e^{X\beta_1}$
-- 通过求对数得到$\ln\hat y=\ln\beta_0+X^T\beta_1$
+- 服从正态分布的$y$的均值
+- Canonical 分布特征
+- 使用$X^T\beta$来拟合正态分布变量$Y$的分布均值参数$\theta$
 
-##### 模型选择
+| PDF                                                          | $f_\theta$                                                   | $\theta$ | $\phi$     | $b(\theta)$          | $b'(\theta)$ | $c(x,\phi)$                                       |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | -------- | ---------- | -------------------- | ------------ | ------------------------------------------------- |
+| $\frac{1}{\sqrt{2\pi}\sigma}\exp(-\frac{1}{2}(\frac{x-\mu}\sigma)^2)$ | $\exp(\frac{\theta}{\sigma^2}x-\frac{x^2}{2\sigma^2}-\frac{\theta^2}{2\sigma^2}-\ln\sigma-\ln\sqrt{2\pi})$ | $\mu$    | $\sigma^2$ | $\frac{\theta^2}{2}$ | $\theta$     | $-\frac{x^2}{2\sigma^2}-\ln\sigma-\ln\sqrt{2\pi}$ |
 
-- 得到link function $g(y)=\ln y=X^T\beta$
+$$
+Y(X)=b'(X^T\beta)=X^T\beta
+$$
 
-- 选取$y$作为泊松分布,即$b(\theta)=e^\theta,g(\mu)=\ln\mu$
+### 2.2 训练和计算流程
 
-### 3.4 倒数转化拟合
+1. 给定$n$个样本$x_i\in\mathbb{R_k}$和观测值$y_i\in \Z$
+2. 对所有样本进行极大似然估计$l_n(y,x;\beta)=\sum(\frac{yx^T\beta}{\sigma^2}-\frac{y^2}{2\sigma^2}-\frac{(x^T\beta)^2}{2\sigma^2}-\ln\sigma-\ln\sqrt{2\pi})$
+3. 导数为$\frac{1}{\sigma^2}(x_iy_i-x_ix_i^T\beta )$
+4. 使用牛顿法/梯度下降方法求得最优解$\beta^*$
 
-##### 基本定义
+# 3. 指数(泊松)回归
 
-- $\hat y=\frac{\alpha x}{h+x}$
-- 两边取倒数得到$\frac{1}{\hat y}=\frac{1}{\alpha}+\frac{h}{\alpha}\frac{1}{x}$
+### 3.1 基本概念
 
-##### 模型选择
+##### 输出
 
-- 得到link function $g(y)=\frac{ay}{a-y}$
-- 选取$y$作为Gamma分布,即$b(\theta)=-\ln(-\theta),g(\mu)=-\frac{1}{\mu}$
+- 服从泊松分布$y$的均值,即到达概率
+- Canonical 分布特征
+
+| PDF                                | $f_\theta$                      | $\theta$     | $\phi$ | $b(\theta)$ | $b'(\theta)$ | $c(x,\phi)$ |
+| ---------------------------------- | ------------------------------- | ------------ | ------ | ----------- | ------------ | ----------- |
+| $\frac{\lambda^x}{x!}e^{-\lambda}$ | $\exp(x\theta-e^\theta-\ln x!)$ | $\ln\lambda$ | $1$    | $e^\theta$  | $e^\theta$   | $-\ln x!$   |
+
+$$
+Y(X)=b'(X^T\beta)=e^{X^T\beta}
+$$
+
+##### 决策模型
+
+- 指数回归<u>用线性变量$X^T\beta$拟合泊松变量$Y$的对数发生概率$\ln \lambda$
+- 在特征空间中,基于$X$的位置预测泊松分布的发生概率,并得到均值
+
+### 3.2 训练和计算流程
+
+1. 给定$n$个样本$x_i\in\mathbb{R_k}$和观测值$y_i\in \Z$
+2. 对所有样本进行极大似然估计$l_n(y,x;\beta)=\sum(yx^T\beta-\exp(x^T\beta)-\ln y!)$
+3. 导数为$y_ix_i^T-x_i^T\exp(x_i^T\beta)$
+4. 使用牛顿法/梯度下降方法求得最优解$\beta^*$
+
+# 4. 逻辑回归
+
+### 4.1 基本概念
+
+##### 输出
+
+- 样本$y$的二分类结果$\{0, 1\}$,服从伯努利分布
+- Canonical 分布特征
+
+| PDF              | $f_\theta$                      | $\theta$           | $\phi$ | $b(\theta)$       | $b'(\theta)$              | $c(x,\phi)$ |
+| ---------------- | ------------------------------- | ------------------ | ------ | ----------------- | ------------------------- | ----------- |
+| $p^x(1-p)^{1-x}$ | $\exp(x\theta-\ln(1+e^\theta))$ | $\ln\frac{p}{1-p}$ | $1$    | $\ln(1+e^\theta)$ | $\frac{1}{1+e^{-\theta}}$ | $0$         |
 
 
+$$
+Y(X)=b'(X^T\beta)=\frac{1}{1+e^{-X^T\beta}}
+$$
 
+##### 决策模型
+
+- 逻辑回归<u>用线性变量$X^T\beta$拟合伯努利变量$Y$落在不同类别的对数概率</u>$\ln\frac{p}{1-p}$
+- 在特征空间中,寻找一条直线$X^T\beta=0$,基于$x$存在的位置,决定输出
+
+### 4.2 训练和计算流程
+
+1. 给定$n$个样本$x_i\in\mathbb{R_k}$和分类结果$y_i\in\{0,1\}$
+
+2. 对所有样本进行极大似然估计$l_n(y,x;\beta)=\sum(y_ix_i^T\beta-\ln(1+\exp(x_i^T\beta)))$
+
+3. 导数为$[(\frac{1}{1+e^{-\beta x^i}})-y_i]x^i$
+
+4. 使用牛顿法/梯度下降方法求得最优解$\beta^*$

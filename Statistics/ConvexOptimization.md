@@ -79,3 +79,10 @@ $y=\theta_1 x_1+\theta_2 x_2\cdots \theta_n x_n\quad\mathrm{s.t.}\quad\forall\th
 
 ### 内点法
 
+##### 牛顿法迭代求极值
+
+1. 假设下一个迭代点$\theta^{k+1}$是最优解,即梯度为0, $\bigtriangledown_L(\theta^{k+1})=0$
+2. 对这个迭代点和上一个迭代点的导数进行二阶泰勒展开$\bigtriangledown_L(\theta^{k+1})=\bigtriangledown_L(\theta^{k})+(\theta^{k+1}-\theta^k)H_L(\theta^k)$
+3. 带入假设,可以得到迭代方程: $\theta^{k+1}=\theta^k-H_L(\theta^k)^{-1}\bigtriangledown_L(\theta^{k})$
+4. 如果二阶导矩阵$H_L$很难计算,则可以用数据点中的fisher information $-I(\theta^k)$代替
+5. $\theta^{k+1}=\theta^k+I(\theta^k)^{-1}\bigtriangledown_L(\theta^{k})$

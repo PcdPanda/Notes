@@ -8,9 +8,68 @@
 - 根据<u>依赖关系</u>合理分配任务
 - 降低子任务间通信开销
 - 提高程序扩展性
+
+### 1.2 Performance Evaluation 衡量标准
+
+##### Absolute Performance
+
+- Wall clock time: 程序运行的总时间
+- Operation per second: 单位时间执行的有效指令数
+
 ##### Speed Up
+
 - 加速比:S=$\frac{T_1}{T_n}$
 - Amdahl’s Law: 如果任务中有$P$比例的任务只能串行,则加速比上限$S_{max} \leq\frac{1}{p}$,本质上就是$T_n=PT_1$
+
+##### Efficiency
+
+- 单位资源的效用
+- 单位可以是时间/金钱成本/功耗/芯片面积
+
+### 1.3 Scalability 可扩展性
+
+##### Strong Scalability
+
+固定工作集大小,提高核心数$P$是否可以保持加速比 (通常不行)
+
+- 根据arithmetic intensity ($\frac{\text{work size}}{\text{tranmission size}}$), 来分析工作集大小和核心数的关系
+
+- 每个核心计算量不变,通信量增加,导致效率加速比下降
+- Cache的容量增加,导致加速比上升
+
+##### Weak Scalability
+
+当工作集大小为$P$倍时,是否可以成比例放大核心数$P$来保持performance
+
+- 更具有现实意义,确保算法可扩展
+
+##### Scalability Constrains
+
+- Problem Constrains: 
+  - 当问题规模变大时,程序的可扩展性
+  - 问题的多个参数可能会相互影响, 例如data size的增加也会导致coverage iteration次数增加
+  - 工作集和输入大小不一定成线性关系,取决于具体算法(例如矩阵运算)
+- Memory Constrains: 
+  - 内存大小不变,算法的可扩展性
+  - IO耗时增加
+  - 当Cache hold不住时,会明显增加开销
+- Time Constrains:
+  - 用时不变,问题的可扩展性
+  - 应用于高频交易/网络响应/实时控制领域
+
+##### Scalability Optimization
+
+1. 确认问题重要特征和核心间的竞争关系
+2. 保留特征,并合理缩小问题规模,并在小机器上测试
+3. 通过帕里托曲线,剔除dominated strategy
+4. 基于有意义的工作集大小进行大规模测试
+
+5. 根据曲线和耗时,分析瓶颈
+   - 删除所有计算过程,分析通信开销
+   - 所有数据访问常数,分析locality开销
+   - 移除所有原子操作和锁,分析竞争开销
+   - 根据CPU运行曲线,分析利用率和内存瓶颈
+
 # 2. Instruction-level-parallelism (ILP)
 <u>提供指令集层面的并行,但是结果和顺序执行一致</u>
 ### 2.1 Pipeline架构
@@ -79,16 +138,223 @@
 - Kernels是作用于data中每个element的function
 - Kernel可以调用下一个Kernel,形成Stream,提高cache affinity
 - 需要提供复杂的算符,来实现kernel间的计算
+
+### 3.3 Cache Coherence
+
+##### Consistency Problem
+
+- 当Core/IO设备更新Cache/buffer时,其他的Core不知道,而导致hit错误数据
+
+- 当有多个Core/IO设备同时更新Cache/Buffer时,可能出现访问结果不一致
+- <u>出现冲突的概率不高,只有个别的Cache Line会在少数CPU之间共享,但是必须保证正确</u>
+
+- Cache中的数据生命周期由Instruction Order决定,而不是执行时间
+- 通过Cache访问内存数据的结果必须一致,且符合某种序列化顺序,不会出现得到"ab"和"ba"的场景
+
+##### Shared Cache Architecture
+
+- 所有核心共享Cache,1个line只会在所有cache中出现一次
+- 核心之间要经常互相访问Cache,导致很高的延迟
+- 需要通过pre-fetch来hide latency
+
+##### Reduce Consistency Problem (Line Padding)
+
+- False sharing: 每个核心访问同一个cache line中的不同数据,频繁同步cache带来大量开销
+
+- Cache line太小可能导致冷数据过多的overhead, 太大容易造成false sharing
+
+- 通过padding 变量的大小为cache line来避免false sharing
+
+  ```c++
+  // false sharing: thread之间可能共享cache line
+  int myPerThreadCounter[NUM_THREADS]; 
+  
+  // padding version: 每个thread只访问自己的cache line
+  struct PerThreadState {
+      int myPerThreadCounter;
+      char padding[CACHE_LINE_SIZE - sizeof(int)];
+  };
+  PerThreadState myPerThreadCounter[NUM_THREADS];
+  ```
+
+##### 多级Cache一致性
+
+- 在每层Cache之间都设置controller开销很大,不现实
+- 确保L1中的数据永远在L2内,则只需要在L2设置controller (需要调整LRU算法来保证inclusion)
+- 当L1中的数据更新时,更新L2 cache line的标志位,而不是立刻更新数据以节省时间
+
+### 3.4 Cache Snooping-Based Model
+
+##### Cache Controller
+
+- 使用Bus在所有核心之间广播操作
+- 受限于总线带宽,不好扩展
+- 维护所有核心中的Cache Line状态,当出现影响Coherence的指令时,触发对应操作 (可以Pipeline化)
+  1. Request: CPU请求总线使用权,获得后把访问的地址置于总线
+  2. Validate: 其他Core的Controller更新各自Cache状态,并发送Ack
+  3. Response: 其他Core/Memory找到数据,并请求发送数据
+  4. Update: 当requestor准备好时,获取Data
+
+##### VI模型 (Write back)
+
+维护两种状态,但每次状态切换都要访问内存,低效
+
+| Valid                                                        | Invalid                                               |
+| ------------------------------------------------------------ | ----------------------------------------------------- |
+| 有效数据,核心可以直接执行write,但<u>写入内存费时,且需要高带宽</u> | 无效数据,read/write前<u>加载内存数据</u>进入Valid状态 |
+
+##### MESI模型 (Write Through)
+
+- 把Valid状态拆分成M, S和E, E状态写入不用上锁
+- 支持核心之间互相获取数据
+
+| Modified                | Exclusive                          | Shared                                       | Invalid  |
+| ----------------------- | ---------------------------------- | -------------------------------------------- | -------- |
+| 已更新,且表示本Core独占 | 独享只读状态,<u>修改不需要上锁</u> | 共享只读状态,<u>修改时需要对其他Core上锁</u> | 无效数据 |
+
+##### Optimization
+
+- 当多个Cache中的数据都有效时,需要决定用哪个core的cache提供数据最高效
+
+  | Cache Model | CPU   | State      | State描述                                 |
+  | ----------- | ----- | ---------- | ----------------------------------------- |
+  | MESIF       | Intel | Forward(F) | 由S状态的Cache line竞争获取F态,并提供数据 |
+  | MOESI       | AMD   | Owned(O)   | 由最先更新数据的核心提供数据              |
+
+- 通过Write-back buffer减少写入内存的延时
+  - 数据进入write buffer之后,直接更新Cache的State
+  - 当CPU想要获取数据时,优先对Write Buffer做检查
+  - 在Cache中维护两份数据,减少Processor和Bus检查Cache Line的竞争
+
+- 总线是共享资源,容易造成死锁/活锁/竞争
+  - 将总线分成Request (Address)部分和Response (Data) 部分,提高带宽
+  - 均匀分配总线使用权
+  - Coherence Protocol将容易造成死锁/活锁的操作原子化
+
+### 3.5 Cache Directory-Based Model
+
+##### Cache Directory
+
+- 一个Cache Line<u>通常只会在少数CPU之间共享</u>,因此<u>点对点同步比使用总线同步效率更高,且可扩展性高</u>
+
+- 通过保存每个cache line的CPU序号,来确定通信的目标
+- 每个Cache Directory只维护本地Numa Region内存对应的Cache
+
+##### 工作流程
+
+1. CPU0需要读取Cache Line
+2. 该Cache Line对应的memory属于CPU2负责,因此发消息给CPU2
+3. CPU2访问Cache Directory,得知最新的版本在CPU3,因此发消息给CPU3
+4. CPU3将数据发给CPU1,并告知CPU2更新该Directory 
+5. 如果是write,则同时告诉其他所有保存该Cache Line的CPU修改validation bit
+
+##### Optimization
+
+- 当CPU很多时,使用CPU序号代替bitmap来保存每个Cache Line的所有者
+- 将Cache Directory保存在L3 Cache中
+  - 实现Cache Directory共享 
+  - 不用保存memory中所有cache line的状态,只要保存出现在L1和L2中的Cache Line状态,节省空间
+
 # 4. GPU Parallelism
 
-### 4.1 基本原理
+### 4.1 处理器架构
 
-##### 硬件架构
+##### Warp-Thread
 
-- 有上千个Core
-- 每个Core有独立的Shared Memory和L1 Cache,可以负责执行多个Block
-- 每个Core中有Warp,对应执行相同Kernel的若干个Thread
-- 每个Core有大量执行单元执行SIMD,对Warp数据施加相同的计算逻辑
+- 一组Warp/Thread会执行相同的程序和指令(kernel function),但是操作的数据不同 (Same Program Multiple Data)
+- Thread: GPU执行的<u>最小逻辑单位</u>,当时数量超过Warp大小时,<u>不一定同时执行</u>,但是通常都在一个Core中执行
+- Warp: GPU<u>执行指令的最小物理单位,同时执行多个Thread</u> (例如32个)
+
+##### Core-Block
+
+- Core: GPU的物理核心,1个Block通常在一个Core内执行
+- Block: 包含多个Thread (可以多维定义Thread的排列),是GPU调度系统的最小逻辑单位
+- 当有空闲的Core的时候,就会分配Block执行,因此<u>Block间可能乱序执行</u>
+
+##### Grid
+
+- GPU的逻辑形式,可以在不同维度定义多个Block
+- 一共有几十个Core,上千个Warp Executor,并行效率非常高
+
+### 4.2 显存架构
+
+##### Global Level Memory
+
+- GDDR6(10GB-level): 带宽为100-1000GB/s,由于GPU的高并行度,<u>显存带宽往往成为程序瓶颈</u>
+- L2-Cache(MB-level): 给所有的Core共享
+
+##### Block(Core) Level Memory
+
+- Shared-Memory(100KB-level): Block内所有thread共享
+
+- 多个L1 Cache: Warp间共享,用来保存Thread运行时的local variable
+
+  
+
+##### Thread(Warp) Level Memory
+
+- Register/L0 Cache: 保存局部变量, 但通常不在thread间共享数据
+
+##### Cache Coherence
+
+- 没有L1的Cache Coherence机制,因为同步成本过高
+
+- 编译时发现写入L1的指令时,会直接改成写入到L2 <u>(Write-through)</u>
+- 每次launch kernel时会Flush L1 Cache,避免因为上个Kernel Function而hit错误数据
+
+
+
+### 4.3 Programming Model
+
+##### Program Global Design
+
+- 需要GPU Malloc才可以在Device分配内存,这些内存所有Block的任意Thread都可以访问
+
+- 在GPU执行计算时,使用<u>Streaming从而同时显存传输数据</u>
+- 定义Block大小时,要<u>考虑会使用的Shared Memory大小,从而让一个Core执行多个Block</u>
+
+```c++
+int N = 1024
+// 在GPU中分配显存
+cudaMalloc(&devInput, sizeof(float) * (N+2));  
+cudaMalloc(&devOutput, sizeof(float) * N);  
+
+const int Nx = 1024, Ny = 1;
+dim3 threadsPerBlock(32, 1, 1); // 定义每个block中有32个线程
+dim3 numBlocks(Nx/threadsPerBlock.x, Ny/threadsPerBlock.y, 1); 
+// grid中x维度有32个block,y维度有1个block,一共32个block
+```
+
+##### <u>Kernel Function Design</u>
+
+- 并行执行,因此参数是并行化传入的(例如数组坐标)
+- 一般没有return,而是直接修改global memory里的值
+- 运行时可以根据thread/block坐标执行不同逻辑(不适合复杂逻辑)
+
+- Block之间的Kernel会乱序执行,因此不能有互相依赖(<u>对Global Memory的访问不要有重叠</u>)
+- Thread之间可以有依赖,通过同步实现,同时共享block的数据
+
+```cpp
+__global__ void convolve(int N, float* input, float* output) {
+    // 每个thread在block中申请共享内存,block内其他线程都可以访问
+    __shared__ float support[THREADS_PER_BLK+2];    
+    // 从输入中读取自己负责的数据,导入到block内
+    int index = blockIdx.x * blockDim.x + threadIdx.x;  
+    support[threadIdx.x] = input[index];
+    // 卷积运算需要额外导入两次
+    if (threadIdx.x < 2) {
+    	support[THREADS_PER_BLK + threadIdx.x] = input[index+THREADS_PER_BLK]; 
+    }
+    // 等block内所有线程都导入完成后再开始计算
+    __syncthreads();
+    float result = 0.0f;  // 线程执行计算
+    for (int i=0; i<3; i++)   
+    result += support[threadIdx.x + i];
+    output[index] = result / 3.f; // 输出到全局内存
+}
+// 并行执行kernel
+convolve<<<N/THREADS_PER_BLK, THREADS_PER_BLK>>>(N, devInput, devOutput); 
+```
 
 ##### 图形渲染流程
 
@@ -97,91 +363,6 @@
 3. 根据实体的特征和视角,将实体分片
 4. <u>对每个分片进行并行的pipeline计算</u>
 5. 对分片上色,并拼接组合
-
-##### 显存架构
-
-- 全局GPU memory (GB level)
-- 全局L2 Cache (MB level)
-- Core中的L1 Cache (KB level)
-- Warp中的寄存器和L0 Cache (Byte level)
-
-### 4.2 CUDA编程架构
-
-##### CUDA术语
-
-- <u>Kernel</u>:在每个thread上执行计算的函数
-
-- Host: CPU端
-- Device: GPU端
-
-##### CUDA并行逻辑和内存
-
-|          | Grid                                                         | Block                                              | Thread                |
-| -------- | ------------------------------------------------------------ | -------------------------------------------------- | --------------------- |
-| 功能     | 运行整个计算的单位                                           | 包含多个Thread,是<u>系统调度的最小单位</u>         | 执行kernel的基本单位  |
-| 硬件映射 | 整个GPU                                                      | 流处理器                                           | Warp                  |
-| 内存     | Global Memory, L2 Cache                                      | Shared Memory, L1 Cache                            | register,L0           |
-| 内存特性 | Host端调用gpu malloc分配,保存输入和输出,所有thread都可以访问 | 由block内每个线程的kernel申请,只有这些线程可以访问 | 保存thread的local var |
-
-##### 调度逻辑
-
-- 以block为单位调度,确保每个block内的线程可以高效访问共享内存
-- 动态调度,当有空闲的核心时,就分配block
-- 不同block可能以任意顺序执行,因此相互之间不应该有依赖
-- 同一个block内的thread,同时执行每一条指令
-
-### 4.3 程序设计
-
-1. 分配block和thread
-
-   - Block之间逻辑应当相互独立
-   - thread之间可以有依赖,通过同步实现,同时共享block的数据
-
-   ```c++
-   const int Nx = 1024, Ny = 1;
-   dim3 threadsPerBlock(32, 1, 1); // 定义每个block中有32个线程
-   dim3 numBlocks(Nx/threadsPerBlock.x, Ny/threadsPerBlock.y, 1); 
-   // grid中x维度有32个block,y维度有1个block,一共32个block
-   
-   ```
-
-2. 分配全局显存并转移数据
-
-   ```c++
-   int N = 1024
-   // 在GPU中分配显存
-   cudaMalloc(&devInput, sizeof(float) * (N+2));  
-   cudaMalloc(&devOutput, sizeof(float) * N);     
-   ```
-
-3. 定义kernel函数 (SPMD执行SIMD)
-
-   - kernel中可以得到thread和block坐标,从而做针对性计算,<u>不适合复杂逻辑</u>
-   - 需要注意每个block申请的共享内存,和每个流处理器的共享内存,尽可能让每个流处理器用足shared memory
-
-   ```c++
-   __global__ void convolve(int N, float* input, float* output) {
-       // 每个thread在block中申请内存,block内其他线程都可以访问
-       __shared__ float support[THREADS_PER_BLK+2];    
-       // 从输入中读取自己负责的数据,导入到block内
-       int index = blockIdx.x * blockDim.x + threadIdx.x;  
-       support[threadIdx.x] = input[index];
-       // 卷积运算需要额外导入两次
-       if (threadIdx.x < 2) {
-       	support[THREADS_PER_BLK + threadIdx.x] = input[index+THREADS_PER_BLK]; 
-       }
-       // 等block内所有线程都导入完成后再开始计算
-       __syncthreads();
-       float result = 0.0f;  // 线程执行计算
-       for (int i=0; i<3; i++)   
-       result += support[threadIdx.x + i];
-       output[index] = result / 3.f; // 输出到全局内存
-   }
-   // 并行执行kernel
-   convolve<<<N/THREADS_PER_BLK, THREADS_PER_BLK>>>(N, devInput, devOutput); 
-   ```
-
-   
 
 # 5. Programming Model
 ### 5.1 基本概念
