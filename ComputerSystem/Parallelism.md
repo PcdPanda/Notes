@@ -26,13 +26,21 @@
 - 单位资源的效用
 - 单位可以是时间/金钱成本/功耗/芯片面积
 
+##### Arithmetic intensity
+
+$$
+\text{Arithmetic intensity}=\frac{i\text{(instructions)}}{n\text{(bytes)}}
+$$
+
+- 衡量CPU计算效率高低,是否将大多数时间放在计算而不是通信上
+
 ### 1.3 Scalability 可扩展性
 
 ##### Strong Scalability
 
 固定工作集大小,提高核心数$P$是否可以保持加速比 (通常不行)
 
-- 根据arithmetic intensity ($\frac{\text{work size}}{\text{tranmission size}}$), 来分析工作集大小和核心数的关系
+- 根据arithmetic intensity, 来分析工作集大小和核心数的关系
 
 - 每个核心计算量不变,通信量增加,导致效率加速比下降
 - Cache的容量增加,导致加速比上升
@@ -83,19 +91,8 @@
 - CPU的指令选择可能依赖之前的结果,之前的结果不同,导致CPU需要执行的指令不同
 - Speculation: CPU不会等待之前的指令全部运行完才做选择,而是提前选择一个branch执行 (正确率>95%)
 - Branch Misprediction有时会成为程序运行的瓶颈
-### 2.2 Out-of-Order Execution (OoO)
-<u>CPU可以同时fetch/commit多条指令,并有多个executor执行指令</u>
-##### Dataflow
-1. 同时fetch和decode多条指令到instruction buffer
-2. 识别指令间的independency并消除不必要的依赖,并制定特定为这套指令执行使用的physical register
-3. <u>根据buffer中指令的耗时,和互相依赖,修改指令的执行顺序</u>
-4. 等有依赖的指令执行完后,再一起commit(节约了commit的耗时)
-5. 清空这套指令依赖的register
-##### Hazard
-- 指令间的互相依赖Critical Path过长,无法并行化
-- 执行时经常有Branch Misprediction,<u>导致上百条指令的优化失效</u>,且必须清空寄存器中的数据.
-- 指令的执行需要特定硬件,如FP,Memory但资源都正在被使用
-### 2.3 Single Instruction Multiple Data(SIMD)
+
+### 2.2 Single Instruction Multiple Data(SIMD)
 ##### AVX Architecture
 - 超宽的寄存器,用来同时保存多个数据
 - CPU包含多个ALU可以对AVX寄存器中的多个数据进行并行计算
@@ -105,11 +102,95 @@
 - 需要程序里精调,或者显式声明SIMD
 - 对编译器和CPU来说很难自动找出可优化点
 - 只能执行简单逻辑的运算
-### 2.4 Limitation
+
+### 2.3 Out-of-Order Execution (OoO)
+
+<u>CPU可以同时fetch/commit多条指令,并有多个executor执行指令</u>
+
+##### Dataflow
+
+1. 同时fetch和decode多条指令到instruction buffer
+2. 识别指令间的independency并消除不必要的依赖,并制定特定为这套指令执行使用的physical register
+3. <u>根据buffer中指令的耗时,和互相依赖,修改指令的执行顺序</u>
+4. 等有依赖的指令执行完后,再一起commit(节约了commit的耗时)
+5. 清空这套指令依赖的register
+
+##### Hazard
+
+- 指令间的互相依赖Critical Path过长,无法并行化
+- 执行时经常有Branch Misprediction,<u>导致上百条指令的优化失效</u>,且必须清空寄存器中的数据.
+- 指令的执行需要特定硬件,如FP,Memory但资源都正在被使用
+
+##### Limitation
+
 - <u>提供的优化不会随着晶体管(执行器)的数量增加而无限增长</u>
 - 判断指令间的dependency有开销
 - 程序的逻辑限制并行度
-# 3. CPU Architecture Parallelism
+
+### 2.4 Memory Consistency
+
+##### Memory Access Out of Order
+
+当针对共享变量的操作乱序执行时,可能导致多线程的逻辑错误
+
+- 线程A 
+
+  ```c++
+  // a, b都初始为0
+  a = 1; 
+  b = 2; 
+  ```
+
+- 线程B (因为A的乱序执行B没有读到a=1的更新)
+
+  ```c++
+  while(b!=2)continue;
+  y = a; // y = 0
+  ```
+
+##### Memory Fence
+
+确保在fence之前的程序执行完成之后才会执行之后的
+
+- 线程A: <u>添加fence确保a=1了以后,b才可以被更新为2</u>
+
+  ```c++
+  // a, b都初始为0
+  a = 1;
+  fence();
+  b = 2;
+  ```
+
+- 线程B: <u>添加fence确保y=a会在b=2之后才运行</u>
+
+  ```c++
+  while(b!=2)continue;
+  fence()
+  y = a; // y = 1
+  ```
+
+##### Dependency
+
+可以通过添加dependency的方法起到fence作用,但是要<u>小心编译器优化</u>
+
+- 取地址
+
+  ```c++
+  // 线程A
+  a = 1;
+  b = a + 1; // b对a有依赖,因此不会乱序执行
+  ```
+
+- 条件判断,只对<u>共享变量写有效,读无效</u>
+
+  ```c++
+  // 线程B
+  if(a);
+  b = a; // 有效,会确保if判断完成才执行
+  z = a; // 无效,可能会在if之前执行,并读到0
+  ```
+
+# 3. CPU Parallelism
 ### 3.1 Multi-Threading
 每个CPU自己会维护一些threading,用来提高并行性,OS会把逻辑线程map到每个core维护的线程里去
 ##### Memory Latency <u>Hiding</u>
@@ -123,21 +204,8 @@
 ##### Thread Pool
 - 提前spawn很多线程,当空闲时,从一个global queue中获取task和参数执行,减少创建thread的overhead
 - Task: 轻量级的线程,可以用function来描述
-### 3.2 Communication Model
-##### Shared Address Space Model
-- 维护一块所有线程可以访问的critical region,使得task之间可以获取互相的状态
-- 需要上锁/原子变量/barrier来维护数据结构的invariability,有不小的开销
-- 需要硬件支持不同core访问相同数据(NUMA/SMP)
-##### Message Passing Model
-- 每个Task只在private address space工作,并通过互相之间发送消息来通信
-- 对硬件没有特定要求,但通信效率比较低,适合机器间通信
-- 可以和Shared Address Space Model互相转换
-- recv和send应该为异步,否则会产生死锁
-##### Data Parallel Model(Streaming)
-- 适合分支少,高吞吐量,粗颗粒度的计算程序
-- Kernels是作用于data中每个element的function
-- Kernel可以调用下一个Kernel,形成Stream,提高cache affinity
-- 需要提供复杂的算符,来实现kernel间的计算
+
+### 3.2 Bus Interconnection
 
 ### 3.3 Cache Coherence
 
@@ -365,19 +433,64 @@ convolve<<<N/THREADS_PER_BLK, THREADS_PER_BLK>>>(N, devInput, devOutput);
 5. 对分片上色,并拼接组合
 
 # 5. Programming Model
-### 5.1 基本概念
-##### Abstraction (Single Program Multiple Data)
-每个核心上运行相同的程序,但是input data不同
-大多数变量都定义为uniform,标识所有task都有相同的value
 
-##### Implementation (Single Instruction Multiple Data)
-每个程序中使用向量化计算,来并行地处理数据
-### 5.2 Decomposition
+### 5.1 Program Decomposition
+
+##### 抽象逻辑
+
+- Abstraction (Single Program Multiple Data): 
+  - 每个核心上运行相同的程序,但是input data不同
+  - 大多数变量都定义为uniform,标识所有task都有相同的value
+- Implementation (Single Instruction Multiple Data)
+  - 每个程序中使用向量化计算,来并行地处理数据
+
+##### 算法设计流程
+
 将程序分解成可并行执行的task,只能由程序员来设计,编译器很难做优化
 1. 先用最简单的方法实现program
 2. 分析program的scalability, max sequential task，再结合硬件decomposition
-3. 控制颗粒度是关键,每个core之间的task尽可能independent,但是自己的task应该尽可能多,且dependent,从而减少调度开销
+3. <u>控制颗粒度是关键</u>,每个core之间的task尽可能independent,但是自己的task应该尽可能多,且dependent,从而减少调度开销
 4. 理想情况是所有core都处于busy状态
+
+### 5.2 Communication
+
+##### 通信延时
+
+传输$n$大小的数据,则有$T(n)=T_0+T_1+\frac{n}{b}$
+
+- 传输延时$T_0$: 准备buffer等耗时
+- 网络延时$T_1$: 数据传输的时间,由距离和传输速度决定
+- 传输带宽 $b$: 把数据送到链路的时间,由位宽和数据量决定
+
+$T_0,T_1$的延时可以通过pipeline隐藏,<u>通常带宽最终成为瓶颈</u>
+
+##### Shared Address Space Model
+
+- 维护一块所有线程可以访问的critical region,使得task之间可以获取互相的状态
+- 需要上锁/原子变量/barrier来维护数据结构的invariability,有不小的开销
+- 需要硬件支持不同core访问相同数据(NUMA/SMP)
+
+##### Message Passing Model
+
+- 每个Task只在private address space工作,并通过互相之间发送消息来通信
+- 对硬件没有特定要求,但通信效率比较低,适合机器间通信
+- 可以和Shared Address Space Model互相转换
+- recv和send应该为异步,否则会产生死锁
+
+##### Data Parallel Model(Streaming)
+
+- 适合分支少,高吞吐量,粗颗粒度的计算程序
+- Kernels是作用于data中每个element的function
+- Kernel可以调用下一个Kernel,形成Stream,提高cache affinity
+- 需要提供复杂的算符,来实现kernel间的计算
+
+##### <u>Design Optimization</u>
+
+- 尽可能提高Arithmetic intensity,让每个thread多完成local task
+- 优化算法,减少Inherent communication
+- 根据硬件机制Cache Design合理分配颗粒度,减少Artifactual communication
+- 重新编排每个Task中的数据存储顺序,增加内存连续读取
+
 ### 5.3 Assignment
 由操作系统/硬件/编译器负责,将task分给每个core来执行,需要考虑<u>负载均衡和locality</u>
 ##### 静态分配
@@ -411,40 +524,6 @@ convolve<<<N/THREADS_PER_BLK, THREADS_PER_BLK>>>(N, devInput, devOutput);
 - 设计两个调度模式,粗颗粒度和细颗粒度
 - 当task数大于thread数时,分配颗粒度较粗,提高每个thread的运行效率
 - 当thread数大于task时,分配颗粒度较细,增加task数量,减少idle的thread
-
-### 5.5 Communication
-
-##### 通信分类
-
-- 通信模式
-
-  - 同步通信: 场景简单,但是需要设计精巧地模型(例如interleave model)
-
-  - 异步通信: 场景众多,通过回调函数方式实现
-
-- 通信原由
-  - Inherent communication: 取决于算法
-  - Artifactual communication: 取决于计算机运行机制,cache的设计逻辑,cache line大小等
-
-##### 吞吐量
-
-传输$n$大小的数据,则有$T(n)=T_0+T_1+\frac{n}{b}$
-
-- 传输延时$T_0$: 准备buffer等耗时
-- 网络延时$T_1$: 数据传输的时间,由距离和传输速度决定
-- 传输带宽 $b$: 把数据送到链路的时间,由位宽和数据量决定
-
-$T_0,T_1$的延时可以通过pipeline隐藏,<u>通常带宽最终成为瓶颈</u>
-
-##### 计算通信比和局部性优化
-
-$$
-\text{Arithmetic intensity}=\frac{i\text{(instructions)}}{n\text{(bytes)}}
-$$
-
-- 合理分配每个核心处理的数据和逻辑,通过<u>优化局部性提高计算通信比</u> (思考grid solver的分配逻辑)
-- 根据cache的访问逻辑,调整程序的运行逻辑,<u>使得每次load cache可以处理尽可能多的数据</u>
-- 根据程序的逻辑,重新排列数据,尽可能<u>连续访问</u>地址 (思考block partition粒子)
 
 ### 5.6 Contention
 
