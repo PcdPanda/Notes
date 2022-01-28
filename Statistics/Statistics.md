@@ -102,6 +102,8 @@
 
 ##### Fisher Information
 
+- <u>当参数服从正态分布时,可以作为标准差有效估计参数的置信区间</u>
+
 - $I(\theta)=Var[(\log L(x;\theta))']=-E[(\log L(x;\theta))'']$
 
 - 基于估计值 $\hat\theta_{mle}$ 分布,<u>越大说明MLE的估计准确概率越高</u>
@@ -110,23 +112,31 @@
   $$
   
 
-  
+### 2.3 <u>Profile Likelihood Estimation</u>
 
-$$
+##### Likelihood Ratio Tests
 
-$$
+- 给定参数集合$\Theta^0$和参数集合$\Theta^1$, $\Theta^0\subset\Theta^1$,维度分别是$D^0<D^1$
 
+- 在参数数量$D$和似然函数中$l(\hat\theta_{MLE})$权衡
+- 通过$AIC=-2\times l(\hat\theta_{MLE})+2D$来选取模型,<u>较低的模型通常表现较好</u>
 
+##### <u>Wilks Approximation</u>
 
+- 对于不同维度的参数$\theta$的似然函数,有$l(\hat{\theta^1_{MLE}})-l(\hat{\theta^0_{MLE}})\approx\frac{1}{2}\chi^2_{D^1-D^2}$
+- 通过卡方分布,可以得到$AIC$的分布
 
-$$
-\sqrt{n}I(\hat\theta)^{1/2}(\hat\theta-\theta)\sim(0,1)\\
-n(\hat{\theta}-\theta)^TI(\hat\theta)(\hat{\theta}-\theta)\sim\chi_n^2
-$$
+##### Profile Likelihood Estimation 估计流程
+
+1. 选取参数$\theta$中的第$d$个参数$\theta_d$,固定$\theta_d$,修改其他变量进行极大似然估计 $l_d^{\text profile}(\theta_d)=\max_{\theta'\in\R^D:\theta'_d=\theta_d}l(\theta')$
+2. 基于Wilks's theorem,获得对于$\theta_d$的95%置信区间 $\{\theta_d: l(\hat\theta)-l_d^{\text profile}(\theta_d)<1.92\}$
+3. Profile Likelihood和常规MLE可以给出相同的最优解,但是<u>通常置信区间更好</u>
+4. <u>PLE适合在似然函数非二次时适用</u>
+5. 完成后通过simulation (bootstrap)来检验置信区间
 
 # 3. Moments Estimation
 
-### 3.1 基本概念
+### 3.1 基本定义
 
 ##### 矩量
 

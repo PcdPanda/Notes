@@ -9,7 +9,7 @@
 - 降低子任务间通信开销
 - 提高程序扩展性
 
-### 1.2 Performance Evaluation 衡量标准
+### 1.2 Performance Evaluation
 
 ##### Absolute Performance
 
@@ -78,8 +78,31 @@ $$
    - 移除所有原子操作和锁,分析竞争开销
    - 根据CPU运行曲线,分析利用率和内存瓶颈
 
+### 1.4 Contention
+
+当并行执行的任务同时需要共享资源时,就会出现竞争
+
+##### Dead/Live Lock
+
+- Dead Lock: Thread之间在互相等待对方的下一步操作,导致没有有效指令可以继续执行
+- Live Lock: Thread进入dead lock之后可以回滚,但是回滚后又不断回到dead lock的状态
+
+##### Starvation
+
+随着任务数量的增加,每个任务的等待延时会无限增长,容易造成饥饿
+
+- 通过Appointment排序: 实现逻辑复杂
+- Tree structure: 每一个thread有上一级的thread来处理,但是子树之间的带宽有限
+- Flat: 无竞争时速度快,有竞争时容易饥饿
+
+##### Contention Avoidance
+
+- 细分共享资源,减少同一资源的并发量 (分布式队列/Virtual Channel)
+- 对输入数据预先排序,从有序性中挖掘信息以减少共享资源的访问次数 (Priority)
+
 # 2. Instruction-level-parallelism (ILP)
-<u>提供指令集层面的并行,但是结果和顺序执行一致</u>
+<u>单独核心提供指令集层面的并行,但是结果和顺序执行一致</u>
+
 ### 2.1 Pipeline架构
 ##### Instruction Parallelism
 - 将指令的执行分为fetch/decode/execute/commit等阶段
@@ -190,7 +213,8 @@ $$
   z = a; // 无效,可能会在if之前执行,并读到0
   ```
 
-# 3. CPU Parallelism
+# 3. CPU Multithread Parallelism
+
 ### 3.1 Multi-Threading
 每个CPU自己会维护一些threading,用来提高并行性,OS会把逻辑线程map到每个core维护的线程里去
 ##### Memory Latency <u>Hiding</u>
@@ -205,7 +229,49 @@ $$
 - 提前spawn很多线程,当空闲时,从一个global queue中获取task和参数执行,减少创建thread的overhead
 - Task: 轻量级的线程,可以用function来描述
 
-### 3.2 Bus Interconnection
+### 3.2 Interconnection Hardware Design
+
+##### 设计要点
+
+| 可扩展性                | 通信延迟                   | 路由结点               | 带宽                              |
+| ----------------------- | -------------------------- | ---------------------- | --------------------------------- |
+| 结点数量对性能的影响    | 结点的通信距离             | 是否可以和工作结点复用 | 是否受限于特定路径                |
+| 增加/删除结点的难易程度 | 是否有多条路径到达相同结点 | 路由算法复杂度         | 结合使用场景分析local和global带宽 |
+
+##### 架构对比
+
+| Topology  | 优点                  | 缺点                                   | 优化                             | 应用            |
+| --------- | --------------------- | -------------------------------------- | -------------------------------- | --------------- |
+| Bus       | Node较少时,性能非常好 | 可扩展性弱,结点多消息会堵塞            | 不同类型的消息用多个bus,提高带宽 | Intel Core Ring |
+| Cross Bar | 结点直连,带宽高       | 很难扩展,结点越多扩展成本越高,且体积大 | 自环绕节省空间                   | Oracle Sun      |
+| Mesh      | 延迟小,扩展性强       | 路由算法复杂,每个结点都是router        | 只连接部分node为mesh             | Intel Xeon      |
+| H-Tree    | 本地流量高            | 每棵树的根节点容易成为瓶颈             | 增加子树间的带宽,减少性能损失    | VLSI            |
+| 可变门    | 延迟小,性能高         | 单条链路负载会变高,容易堵塞            | 优化router布局,添加router数量    | FPGA            |
+
+##### Flow Control
+
+- Package:
+  - 网络间传输消息的最小单位,包含header和tail
+  - Header: 包含Package的目的地和Package大小,便于router
+  - Tail: 消息发送/转发者提供的附加信息
+- Flit: Package的子单位,作为拥塞控制的最小单位,同一个Package的Flit都按照相同顺序和路径传播
+
+- Buffering: 当Flow过大时,将package先保存在buffer中,之后再转发
+
+##### Routing
+
+- Message-Based:
+
+  - 发送消息前,<u>先probe可用链路</u>,确定可用后再发送(Probe成本可能很高)
+  - 获得可用链路后,可以<u>发送任意数量的消息</u>,直到发完为止
+
+  - 容易造成Contention,且容易blocking
+
+- Package-Based:
+
+  - 同一条Msg的不同package可以按照不同的路线抵达目的地
+  - <u>每个路由器一收到Pkg的Header就可以规划下一条路径,而不是等待所有payload抵达</u>
+  - <u>当路由器对于Pkg的负载过大时,将package拆分成flit,降低每个package使用的带宽,从而发送多个package的消息避免死锁</u>
 
 ### 3.3 Cache Coherence
 
@@ -323,6 +389,8 @@ $$
   - 实现Cache Directory共享 
   - 不用保存memory中所有cache line的状态,只要保存出现在L1和L2中的Cache Line状态,节省空间
 
+
+
 # 4. GPU Parallelism
 
 ### 4.1 处理器架构
@@ -369,8 +437,6 @@ $$
 
 - 编译时发现写入L1的指令时,会直接改成写入到L2 <u>(Write-through)</u>
 - 每次launch kernel时会Flush L1 Cache,避免因为上个Kernel Function而hit错误数据
-
-
 
 ### 4.3 Programming Model
 
@@ -432,7 +498,7 @@ convolve<<<N/THREADS_PER_BLK, THREADS_PER_BLK>>>(N, devInput, devOutput);
 4. <u>对每个分片进行并行的pipeline计算</u>
 5. 对分片上色,并拼接组合
 
-# 5. Programming Model
+# 5. Parallel Program Design
 
 ### 5.1 Program Decomposition
 
@@ -525,17 +591,185 @@ $T_0,T_1$的延时可以通过pipeline隐藏,<u>通常带宽最终成为瓶颈</
 - 当task数大于thread数时,分配颗粒度较粗,提高每个thread的运行效率
 - 当thread数大于task时,分配颗粒度较细,增加task数量,减少idle的thread
 
-### 5.6 Contention
+# 6. Synchronization
 
-##### 饥饿
+### 6.1 Lock Implementation
 
-随着任务数量的增加,每个任务的等待延时会无限增长,容易造成饥饿
+##### Lock要求
 
-- Appointment: 实现逻辑复杂
-- Tree structure: 每一个thread有上一级的thread来处理,结果是数据更新缓慢
-- Flat: 无竞争时速度快,有竞争时容易饥饿
+| Low Latency              | Low Traffic                  | Scability                 | Low Storage      | Fairness           |
+| ------------------------ | ---------------------------- | ------------------------- | ---------------- | ------------------ |
+| Lock Free时,应当立即获得 | 竞争锁的时候,Traffic越少越好 | 处理器过多时,性能影响有限 | 不会占用大量内存 | 不会造成Starvation |
 
-##### 优化
+##### CAS Based Lock
 
-- 细分共享资源,减少同一资源的并发量 (思考分布式队列和子列表)
-- 对输入数据预先排序,从有序性中减少共享资源的访问次数
+```c++
+// 上锁: 不断进行原子操作,知道可以得到1为止,代表上锁成功
+while(compare_and_swap(lock, 1)); 
+// 解锁
+lock = 0;
+```
+
+- 不保证公平性,因为不知道谁第一个CAS成功
+- Traffic很多,且当CAS失败时,OS可能进入Kernel让线程Sleep
+
+##### Test-and-CAS Lock
+
+只有当前lock空闲时,才会尝试竞争,减少CAS尝试次数
+
+```c++
+while(1){
+    while(lock!=0); // 这里只是Read,没有interconnection
+    if(compare_and_swap(lock, 1))break; // 这一步要求同步cache非常耗时
+}
+```
+
+##### Sleeping Lock
+
+```c++
+sleep_time = 1;
+while(1){
+    if(compare_and_swap(lock, 1))break
+    sleep(sleep_time);
+    sleep_time *= 2;
+}
+```
+
+- 没有抢到锁时sleep,进一步减少contention
+- sleep_time增长太快,可能导致严重的不公平
+
+##### Ticket Lock
+
+```c++
+struct Lock{
+    volatile int next_user;
+    volatile int user;
+}
+// 上锁
+int my_ticket = atomic_incre();
+while(my_ticket != lock->next_user); // 通过叫号来判断是否轮到自己
+// 解锁
+lock->next_user++;//上一个释放锁的线程叫下一个线程
+```
+
+- 只有取票和解锁需要同步
+
+##### Array Based Lock
+
+```c++
+struct Lock{
+    volatile padding_int status; // 把lock填充到cache line大小,减少false sharing 
+}
+int my_ticket;
+// 上锁
+int my_ticket = atomic_incre();
+while(!locl->status[myticket]); // 通过叫号来判断是否轮到自己
+// 解锁
+lock->status[my_ticket] = 0;
+lock->status[my_ticket++] = 1; // 交下一个号 
+```
+
+- 需要额外空间(O[P])
+- 每次释放锁只要更新一个Cache
+
+### 6.2 Optimized Data Structure
+
+##### Fine-grained Lock Queue
+
+- 每个结点都有各自的lock
+- 每次删除/添加结点时,必须先持有上一个结点的锁,才可以进行操作
+- 通过连环锁的机制,保证了访问的序列化
+- 并行度提高,存储开销大,且访问第$n$个点,要操作$n$个锁
+
+##### Lock Free Queue
+
+- <u>Push和Pop操作各自private的数据结构</u>
+- 数组实现: 通过head_index和tail_index记录push和pop的位置
+- 链表实现: tail和head操作不一样的指针,pop删除数据,而是修改上次pop的指针位置
+
+##### CAS
+
+- 使用CAS操作来检验添加/删除是否有效
+- CAS前,可能因为其他线程free结点,而导致引用空内存
+- 维护一个全局的私有指针数组,每个指针只有自己线程可写,其他线程可读,记录了当前使用的内存. 只有不在指针里的结点可以被删除
+- <u>如果竞争非常激烈,线程要一直循环CAS的话,lock-free的效果可能不好</u>
+
+##### <u>ABA Problem</u>
+
+- 在CAS操作之前,另一个线程可能pop再push了一次<u>,导致没有被CAS发现,从而得到错误数据</u>
+- 需要维护一个计数的原子变量,可以在CAS时发现被push的次数
+- 把CAS的变量和计数放在一个struct里,并使用更高宽度的CAS操作一次比较多个值
+
+### 6.3 Centralized Barrier
+
+##### 功能
+
+- 使得<u>多个Thread在Barrier前同步</u>
+- 需要考虑线程切换和同步开销. 如果Thread 1释放后又执行Barrier,需要让Thread 2知道之间中间的Barrier已经完成
+
+##### Implementation
+
+```c++
+struct Barrier_t {
+    LOCK lock;
+    int  counter;   // 记录Block的Thread数量
+    int  flag;      // Barrier是否已释放
+};
+int local_sense = 0;  // 每个Thread认可的Barrier
+void Barrier(Barrier_t* b, int p) {
+    local_sense = (local_sense == 0) ? 1 : 0; // 下一次只认可flag和local_sense不同的barrier,避免重复堵在同一个Barrier前
+    lock(b->lock);
+    int num_arrived = ++(b->counter);
+    if (b->counter == p) {  
+        unlock(b->lock);
+        b->counter = 0;
+        b->flag = local_sense;
+    }
+    else {
+    	unlock(b->lock);
+        while (b.flag != local_sense);  // wait for flag
+    } 
+}
+```
+
+##### Traffic Analysis
+
+- 每次更新counter都会需要告知所有的Processor,有$O(N)$的开销
+- 更新Counter和unlock都有竞争,会碰到scalability问题
+- 通过Tree-Like Barrier Structure来减少通信延迟($O(\ln N)$)
+
+### 6.4 Transactional Memory
+
+##### Advantage
+
+```c++
+void transfer(char* A, char* B, int amount){
+    atomic{ // 程序员不需要实现并发控制和回滚
+        withdraw(A, amount);
+        deposit(B, amount);
+    }
+}
+```
+
+- 程序员只需要实现程序逻辑,不用管并发问题,减少犯错概率
+- 系统自动使用细颗粒度的并发控制,提高运行效率
+- 自动实现Transaction Abort的Restart
+
+##### Eager Version (Optimistic)
+
+- 每次R/W会直接更新内存,发现conflict就abort
+- 可以较早发现conflict,但是比对频率高,开销大
+- 如果失败就执行Undo Log (<u>执行过程中需要上锁,且执行慢</u>)
+
+##### Lazy Version (Pessimistic)
+
+- 只有Commit的时候比对Conflict再更新内存
+- 运行过程开销小,commit开销大,且发现晚
+- commit前数据都保存在local working set,commit时提交
+
+##### Cache Coherence Implementation
+
+- 以Cache line为颗粒度,每个Thread Cache在本地操作,添加了标志位说明R/W
+- Commit的时候作为Coherence协议的一部分和其他CPU同步
+- 可能要维护两份Cache line,一份是undo log
+- <u>不适合对很大的memory set进行操作,因为cache line会被置换出去</u>
