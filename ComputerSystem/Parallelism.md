@@ -773,3 +773,121 @@ void transfer(char* A, char* B, int amount){
 - Commit的时候作为Coherence协议的一部分和其他CPU同步
 - 可能要维护两份Cache line,一份是undo log
 - <u>不适合对很大的memory set进行操作,因为cache line会被置换出去</u>
+
+# 7. Domain Specific Solution
+
+### 7.1 硬件异构
+
+##### Asymmetric Amdahl's Law
+
+| $f$                | $V_1$          | $r,n$                     |
+| ------------------ | -------------- | ------------------------- |
+| 并行计算的指令比例 | 顺序执行的速度 | 性能分别为$V_r,V_n$的核心 |
+
+
+$$
+\text{speed up}=\frac{1}{\frac{1-f}{V_1} + \frac{f}{r\cdot V_r+n\cdot V_n}}
+$$
+
+- 当核心数量增加时,异构可以取得更好的加速比
+
+##### 异构性能提升
+
+|      | 能耗比     | 芯片面积  |
+| ---- | ---------- | --------- |
+| GPU  | 10x        | 1/7x-1/5x |
+| ASIC | 100x-1000x | 1/1000x   |
+
+##### 异构使用案例
+
+- CPU大小核设计
+- 相机的光学图像处理单元
+- GPU浮点运算和纹理单元分离
+
+##### Challenges
+
+- 可扩展性不强,无法reprogramm
+- 设计/验证成本高
+- 需要合理评估并分配不同异构单元占用的资源,<u>避免特定单元成为瓶颈</u>
+
+### 7.2 Domain Specific Language (DSL)
+
+##### Main Idea
+
+- <u>将特定领域的问题抽象化,专注于运行性能和开发遍历,放弃可扩展性</u>
+- 在编译时挖掘并行性,并自动优化提高性能 (SQL)
+
+##### Liszt Program (Mesh Programming)
+
+- 将Mesh中的vertex, cell, edges抽象化,用户只能使用特定的接口访问attribute
+- 在编译时,根据抽象数据结构的访问结构,挖掘locality, parallelism和synchronization来提高性能
+- 在Cluster上运行时,会把mesh按照每个结点的内存大小分片到每个机器上运行,不同结点仅仅交互边界数据
+- 在GPU上运行时,会挖掘可同时运行的task(不连接的vertex),并放在不同CUDA threads上迭代运行
+
+##### Halide (Image Blurring)
+
+- 每个像素通过平滑四周3*3的像素计算
+
+- 按行使用Buffer,尽可能多地使用连续访问,并保存会重复访问/读取的数据到cache
+- <u>Buffer的大小根据Cache和Cache Line的大小决定,确保没有Reload Cache Line</u>
+- 需要权衡Instruction次数和Cache处理的Locality
+- 抽象向量和并行化操作
+
+### 7.3 Graph
+
+##### 图的抽象
+
+- 将图提取成Vertex和Edges,并定义相关的operator来实现有关算法(例如Page Rank)
+- 提供同一接口,而不用管底层图的压缩和集群上的表示
+- 将图分片成若干个shard,每个shard只保存指向到特定destination nodes的边,且这些边都按照source node排序
+
+##### 执行引擎
+
+- 同步执行: 保存一个副本数据结构,每次同步更新所有节点,并把结果保存在副本上,两个副本交替使用(因为有同步所以速度慢)
+- 异步收敛执行: 当一个结点更新后,会触发signal并告知调度器更新其他shard中的结点(调度顺序会在很大程度上影响performance)
+
+##### 内存优化
+
+- 单机上内存有限,不可能放下整个图,但是磁盘随机访问效率过低
+- 每次访问,将当前shard和相关的shard连接构成子图,当前shard里的edge已经排好序了,所以都是顺序访问
+- 图的访问受限于带宽,因此CPU较空闲,可以对图进行压缩,提高性能
+
+### 7.4 Deep Learning Neuro Network
+
+##### 矩阵计算
+
+- 将矩阵拆分成Cache Line大小的block,进行block matrix multiplication
+- 使用稀疏矩阵保存每一层的输入/输出矩阵
+
+##### 网络压缩
+
+- 删除反复迭代后接近为0的权重
+- 将不同的weight聚类,聚类后使用相同的变量进行训练
+
+##### 并行训练
+
+- <u>使用集群训练,可以异步更新数据(因为难得碰到一次读写冲突不会影响参数迭代)</u>
+- 结点间共享参数,但是可以独立计算梯度,并累加
+- 也可以水平/垂直划分网络,但是需要考虑依赖和通信开销
+
+### 7.5 Web System
+
+##### Web Server
+
+- 使用多进程,可以确保系统的鲁棒性
+- 进程池会根据当前web server的负载调整worker数量
+- 通过优化的convertor来提高web脚本语言的运行效率
+- 无状态运行(将session信息保存在DB中),防止因server宕机影响用户访问
+
+##### Workload balance
+
+- 使用roundrobin/状态监控等方式来实现负载均衡
+- 监控<u>response time</u>,当发现response time明显延长时,启用备用服务器执行web任务,不用时则作为云计算服务器租借
+- 在每一层都添加缓存包括前端服务器/CDN/Web server和DB
+
+##### Data System
+
+- 包含内存数据库缓存(Key-value)和常规数据集群(Relation DB)来提高query效率
+- 通过分片和副本提高吞吐量,但是要考虑到同步开销
+
+- 保存服务器的状态信息,提高系统鲁棒性,但也会增加负载
