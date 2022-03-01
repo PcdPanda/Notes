@@ -28,9 +28,22 @@ v1 <- c(1,2,3)
 v2 <- c(3:5) # 切片生成向量[3,4,5]
 ```
 
-
-
-
-
 ### 1.3 面板数据
+
+##### 时间戳
+
+```R
+ts <- as.Date(df$Date, format="%m/%d/%Y")
+```
+
+### 1.4 Plot
+
+##### 绘制子图
+
+```R
+par(mfrow=c(2,2))
+plot(SP500wk,xlab=’week’,ylab=’closing price’,type=’l’) # line plot
+boxplot(SP500wk_lreturn) # boxplot
+hist(SP500wk_lreturn,xlab=’wkly log returns’,breaks=25,main=’SP500 weekly log returns’) #直方图
+```
 

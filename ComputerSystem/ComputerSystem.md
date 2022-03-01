@@ -444,7 +444,7 @@ elf文件被装载进内存,运行时主要涉及6部分
 
   ```c++
   int main(int argc, char* argv[]){
-      int fd, s = 10000 & 0x1;
+      int fd;
       char c1, c2;
       fd = open("./file", O_RDONLY, 0);
       read(fd, &c1, 1); 

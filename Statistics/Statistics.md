@@ -112,31 +112,85 @@
   $$
   
 
-### 2.3 <u>Profile Likelihood Estimation</u>
+### 2.3 Likelihood Ratio Test
 
-##### Likelihood Ratio Tests
+##### Nest Hypotheses
 
-- 给定参数集合$\Theta^0$和参数集合$\Theta^1$, $\Theta^0\subset\Theta^1$,维度分别是$D^0<D^1$
+- 给定有$D$个参数$\Theta\in\mathbb{R}^D$的模型,只考虑有限参数对于似然函数的贡献
 
-- 在参数数量$D$和似然函数中$l(\hat\theta_{MLE})$权衡
-- 通过$AIC=-2\times l(\hat\theta_{MLE})+2D$来选取模型,<u>较低的模型通常表现较好</u>
+- 给定两个嵌套的参数集合$\Theta_0\subset\Theta_1$,维度是$D_0<D_1\leq D$
+- 给定两个hypotheses: $H_0:\theta\in\Theta_0,H_1:\theta\in\Theta_1$
 
-##### <u>Wilks Approximation</u>
+##### Wilks approximation
 
-- 对于不同维度的参数$\theta$的似然函数,有$l(\hat{\theta^1_{MLE}})-l(\hat{\theta^0_{MLE}})\approx\frac{1}{2}\chi^2_{D^1-D^2}$
-- 通过卡方分布,可以得到$AIC$的分布
+- 在$H_0$成立时,则有
+  $$
+  \sup_{\theta\in\Theta_1} \mathscr{l}(\theta)-\sup_{\theta\in\Theta_0} \mathscr{l}(\theta)\approx\frac{1}{2}\chi^2_{D_1-D_2}
+  $$
+
+- 如果P-Value过小,说明$H_1$成立,即$D_1$新加的参数很有意义
+
+##### <u>Information Criterion</u>
+
+- $AIC=-2\times l(\hat\theta_{MLE})+2D$
+- $BIC=-2\times l(\hat\theta_{MLE})+D\log n$
+- 通过卡方分布,可以得到$AIC$和$BIC$的分布,并通过$AIC$或$BIC$的指标选取模型,越低越好
+- 在参数数量$D$和似然函数中$l(\hat\theta_{MLE})$权衡 (矩阵参数中的每一个变量要单独)算作$D$)
+
+### 2.4 <u>Profile Likelihood Estimation</u>
+
+##### 估计逻辑
+
+- 基于Likelihood Ratio Test,如果$\sup_{\theta\in\Theta_1} \mathscr{l}(\theta)-\sup_{\theta\in\Theta_0} \mathscr{l}(\theta)>\frac{1}{2}\chi^2_{D_1-D_2}$, 则可以拒绝$H_0$ (即说明$\Theta_0$不够用)
+- 因此在不可以拒绝$H_0$的区间里,可以认定$\theta$有效
 
 ##### Profile Likelihood Estimation 估计流程
 
 1. 选取参数$\theta$中的第$d$个参数$\theta_d$,固定$\theta_d$,修改其他变量进行极大似然估计 $l_d^{\text profile}(\theta_d)=\max_{\theta'\in\R^D:\theta'_d=\theta_d}l(\theta')$
-2. 基于Wilks's theorem,获得对于$\theta_d$的95%置信区间 $\{\theta_d: l(\hat\theta)-l_d^{\text profile}(\theta_d)<1.92\}$
+2. 基于Wilks's theorem,获得对于$\theta_d$的95%置信区间 $\{\theta_d: l(\hat\theta)-l_d^{\text profile}(\theta_d)<\frac{1}{2}\chi_{\alpha,\bigtriangleup D}\}$
 3. Profile Likelihood和常规MLE可以给出相同的最优解,但是<u>通常置信区间更好</u>
 4. <u>PLE适合在似然函数非二次时适用</u>
 5. 完成后通过simulation (bootstrap)来检验置信区间
 
-# 3. Moments Estimation
+# 3. Kernel Density Estimation
 
-### 3.1 基本定义
+### 3.1 Overview
+
+##### 使用场景
+
+- 给定若干个离散样本,估计样本的概率分布函数$\hat f_b(x)$
+- 无法直接获得$\hat f_b(x)$的分布模型和分布参数,但是可以通过plot来猜测
+- 通常极值的样本较少,因此不适合估计tail
+
+##### Bandwidth $b$
+
+- 描述了平滑分布对于离散样本信息的利用程度
+- $b$越大,拟合离$K_b$分布越接近,越平滑
+- $b$越小,拟合离样本分布越接近,但容易过拟合
+
+### 3.2 Application
+
+##### Kernel-Based Estimation
+
+- 给定若干个离散样本$x_i$,构造平滑分布
+  $$
+  \hat f_b(x)=\frac{1}{n}\sum_{i=1}^nK_b(x-x_i)
+  $$
+
+- $K_b$: kernel function,可以是任何density function
+
+- 本质上是样本的平滑分布,$b$描述了平滑性
+
+##### Kernel-Based Estimation Property
+
+- 期望: $E[\hat f_b(x)]=\frac{1}{n}\sum_{i=1}^n E[K_b(x-x_i)]$ (对于不同的$x_i$求积分算期望)
+  - 如果$x_i$是iid则有$E[\hat f_b(x)]=(K_b*f)(x_i)$
+
+- 方差: $Var[\hat f_b(x)]=\frac{1}{n}\sum_{i=1}^n Var[K_b(x-x_i)]$
+
+# 4. Moments Estimation
+
+### 4.1 Overview
 
 ##### 矩量
 
@@ -154,7 +208,7 @@ $$
 - 任何连续函数可以用$N$阶多项式无限逼近
 - 样本分布的PDF,可以用$k$个矩量来逼近
 
-### 3.2 估计流程
+### 4.2 估计流程
 
 ##### 计算流程
 
@@ -180,9 +234,125 @@ $$
 1. 先使用Moment来找到合理的$\hat\theta$
 2. 以$\hat\theta$出发,通过MLE在附近寻找局部最值,通常就是全局最值
 
-# 4. 贝叶斯统计 
+# 5. Bootstrap
 
-### 4.1 基本概念
+### 5.1 Overview
+
+##### 适用场景
+
+- 模型非常复杂,参数很难估计/检验
+- 模型的假设不确定
+- 有意义的数据量有限
+
+##### 核心思想
+
+- 把sample作为已知参数的总体
+- 从sample中resample,从resample的结果找到估计误差
+
+### 5.2 实际应用
+
+##### <u>估计流程</u>
+
+1. 从真实的population中获取sample
+2. 把获得的sample当做population,并从中多次重复抽样构造子样本 (with replacement)
+3. 在每个子样本中对$\theta$进行估计
+4. 分析子样本估计值$\hat\theta^*$针对sample中估计值$\hat\theta$的bias和MSE
+5. 将误差带入到sample的点估计值,获得置信区间
+
+##### 置信区间
+
+1. 计算子样本参数估计值$\hat\theta^*$和真实样本参数估计值$\hat \theta$的误差的分位值$\delta_l,\delta_u$
+2. 将误差分位值视作全体样本参数$\theta$和真实样本参数估计值$\hat\theta$误差的分位值
+3. 带入误差分位值,则有$\theta\in[\hat\theta+\delta_l,\hat\theta+\delta_u]=[2\hat\theta-\hat\theta^*_u,2\hat\theta-\hat\theta^*_l]$
+
+# 6.(MCMC) Markov Chain Monte Carlo
+
+### 6.1 蒙特卡洛法
+
+##### Overview
+
+- 设计方法来构造大量符合特定模型生成的样本
+- 在已知模型结构的情况下,可以根据样本接受/拒绝的频率,获得模型的参数
+- 在已知模型参数,但是不好计算特征的情况下,可以根据样本来估计期望等参数
+
+##### 蒙特卡洛积分
+
+- 通过抽样平均方法求解$\int_{a}^bf(x)\mathrm dx$的积分
+
+- 假定$x$在$[a,b]$区间服从$p(x)$的分布
+- 则根据积分定义,可以有$\int_{a}^bf(x)\mathrm dx=\int_{a}^b\frac{f(x)}{p(x)}p(x)\mathrm dx\approx\frac{1}{N}\sum_{i=1}^N\frac{f(x_i)}{p(x_i)}$
+
+##### 蒙特卡洛抽样
+
+- 对于已知,但是不好构造的分布$p(x)$,通过抽样使得结果逼近真实的概率分布$p(x)$
+- 通过蒙特卡洛抽样获得的结果,可以有效对期望,方差等分布参数进行估计
+
+### 6.2 马尔科夫链
+
+##### Overview
+
+- 对于$t$时刻状态向量$X_t$,存在不变一阶马尔科夫矩阵$P$,使得下一次状态为$X_{t+1}=PX_t$
+- $P$的每一列和为1,代表从第$i$个状态转换到$j$的概率
+- 平稳的马尔科夫链,经过有限步之后,会收敛于所有列相同的矩阵$\lim_{t\rightarrow\infty}P^t=\begin{bmatrix}\pi&\pi\cdots\end{bmatrix}$
+- $\pi$是$P$特征值为1的特征向量,描述了马尔科夫链的最终稳态,且元素和为1
+
+##### 连续平稳马尔科夫链
+
+- 可以将离散列向量$\pi$连续化,$\pi(x)$即代表$x$在稳态分布出现的概率
+- 同时可以将马尔科夫矩阵连续化,即每个元素是状态转移概率$P(x_{t+1}|x_t)$
+- 给定稳态分布$\pi(x)$,需要找到使得服从$\pi(x^*)=\int P(x^*|x)\pi(x)\mathrm dx$的$p$,即以$\pi(x)$为特征向量的马尔科夫转换矩阵
+- <u>假设$x$已经服从平稳分布$\pi(x)$则无论经过几次转换,每次结果都服从平稳分布,因此以$x$作为采样点就可以构造蒙特卡洛采样</u>
+
+##### <u>细致平稳分布 (Detail Balance)</u>
+
+- 给定一个分布$p(x)$,则从分布中的任意两点,以不同顺序获取的概率相同
+- 对于任意$x_1,x_2$有$p(x_1)P(x_2|x_1)=p(x_2)P(x_1|x_2)$
+- 对于满足$p(x)$细致平稳分布的转移矩阵$P$,则$p(x)$即$p$的稳态$\pi(x)$
+
+### 6.3 MCMC抽样
+
+##### 算法流程
+
+1. 给定需要采样的分布$p(x)$
+2. 找到满足和$p(x)$满足细致平稳分布的状态转移概率$P(x^*|x)$
+3. 给定任意的目标稳态分布$p(x)$和转移方程$P(x^*|x)$,可以通过<u>构造采样率</u>$\alpha(x^*,x)$使得$P'(x^*|x)=P(x^*|x)\alpha(x^*,x)$，满足平稳分布
+4. 在对$P(x)$进行burn-in操作后,开始采样,此时采样的数据即服从稳态$\pi(x)$的分布,也是$p(x)$的分布
+
+##### Reject Sampling
+
+1. 构造一个方便采样的proposed distribution $p(x)$
+
+2. 生成一个常数$c$,使得$cq(x)\geq p(x)$
+3. 从$q(x)$的分布中随机采样一个数字$x$
+4. 新样本的接受率为$\frac{p(x)}{cq(x)}$
+5. <u>如果$q(x)$和$p(x)$的分布相差很多,则接受率非常低</u>
+
+##### <u>M-H采样</u>
+
+1. 给定需要采样的分布$p(x)$和<u>任意马尔科夫转移分布</u>$P(x^*|x)$,构造接受率$\alpha(x,x^*)=\min\{1,\frac{p(x^*)P(x|x^*)}{p(x)P(x^*|x)}\}$
+2. 基于$p(x)P(x^*|x)\alpha(x,x^*)$构造的转移概率为$p(x^*)P(x|x^*)\min\{\frac{p(x)P(x^*|x)}{p(x^*)P(x|x^*)},1\}=p(x^*)P(x|x^*)\alpha(x^*,x)$即满足细致平稳分布
+3. 如果没有接受,就回到上一个点重新采样
+4. 用尽量使用$p(x)$的性质构造$P$,以提高采样率
+
+##### <u>Gibbs Sampling</u>
+
+- <u>本质是接受率恒为1的M-H采样,大幅提高在高维空间中采样的效率</u>
+
+- 对于采样结果$X_t=[\alpha_t,\beta_t,\gamma_t,\cdots]$,每个维度的采样,都会依赖于上其他维度的采样结果
+
+  1. $\alpha_{t+1}\sim P(\alpha|\beta_t,\gamma_t,\cdots)$
+
+  2. $\beta_{t+1}\sim P(\beta|\alpha_{t+1},\gamma_t,\cdots)$
+  3. $\gamma_{t+1}\sim P(\gamma|\alpha_{t+1},\beta_{t+1},\cdots)$
+
+- 令条件分布$P(\alpha|\beta_t,\gamma_t,\cdots)$作为状态转移概率,则满足平稳分布
+  $$
+  p(\alpha_1,\beta_1,\gamma_1)P(\alpha_2|\beta_1,\gamma_1)=P(\alpha_1|\beta_1,\gamma_1)p(\beta_1,\gamma_1)P(\alpha_2|\beta_1,\gamma_1)=p(\alpha_2,\beta_1,\gamma_1)P(\alpha_1|\beta_1,\gamma_1)
+  $$
+
+# 7. 贝叶斯统计 
+
+### 7.1 基本概念
 
 ##### 优势
 
@@ -203,7 +373,7 @@ $$
 
 - 贝叶斯置信范围: $P[\theta\in Reg|D]=1-\alpha$
 
-### 4.2 估计流程
+### 7.2 估计流程
 
 ##### Jeffrey prior
 
@@ -220,16 +390,26 @@ $$
 3. 使用贝叶斯定理计算$\theta$后验分布 (通过凑项数找参数)
 
 $$
-P(\theta|D)=\frac{P(D|\theta)p(\theta)}{\int P(D|\theta)p(\theta)\mathrm{d}\theta}
+P(\theta|D)=\frac{P(D|\theta)P(\theta)}{\int P(D|\theta)P(\theta)\mathrm{d}\theta}
 $$
 
 4. 如果更新后<u>分布模型</u>没变,只改变了参数,则模型是conjugate prior
 
+##### 分母处理方法
+
+- 通过数值方法模拟计算
+- 直接抛弃,不影响找$\hat\theta$
+
+##### <u>共轭分布</u>
+
+- 如果后验$P(\theta|D)$和$P(\theta)$形式相同,则似然函数$P(D|\theta)$和先验分布$P(\theta)$互相共轭
+- 不需要计算分布,也可以判断是否共轭,且根据似然函数挑选合适的先验分布可以大大简化计算
+
 <div STYLE="page-break-after: always;"></div>
 
-# 5. Hypothesis Test
+# 8. Hypothesis Test
 
-### 5.1 Fisher Test
+### 8.1 Fisher Test
 
 ##### Null Hypothesis
 
@@ -249,7 +429,7 @@ $$
 
 - <u>计算的时候需要把更差的样本一并考虑</u>
 
-### 5.2 <u>Decision Theory</u>
+### 8.2 <u>Decision Theory</u>
 
 ##### Hypothesis
 
@@ -276,7 +456,7 @@ Test的有效性 ($\alpha$和$\beta$都要尽量低)
   n\approx\frac{(z_{\alpha/2}+z_\beta)^2\sigma^2}{\delta^2}
   $$
 
-### 5.3 检验流程
+### 8.3 检验流程
 
 ##### 决策步骤
 
@@ -298,7 +478,7 @@ Test的有效性 ($\alpha$和$\beta$都要尽量低)
    
 5. P-Value$\leq\alpha$,就reject $H_0$并接受$H_1$
 
-### 5.4 接受率分析
+### 8.4 接受率分析
 
 通过抽样调查判断样本中的缺陷率
 
@@ -312,9 +492,9 @@ Test的有效性 ($\alpha$和$\beta$都要尽量低)
 - $\alpha: P[H_1|H_0^*]$ 生产者风险(实际风险率没有样本这么高,消费者应该接受)
 - $\beta:P[H_0|H_1^*]$ 消费者风险(实际风险率比样本高,消费者不应该接受)
 
-# 6. 样本检验
+# 9. 样本检验
 
-### 6.1 单样本检验
+### 9.1 单样本检验
 
 ##### 均值T-test
 
@@ -364,7 +544,7 @@ $\sum_i^k \frac{(X_i-np_i)^2}{np_i}\sim\chi_{k-1}^2$
 
 $\chi_{(r-1)(c-1)}^2=\sum_{i=1}^r\sum_{j=1}^c\frac{(O_{ij}-E_{ij})^2}{E_{ij}}$
 
-### 6.2 多样本检验
+### 9.2 多样本检验
 
 ##### 检验均值差(已知方差)
 
@@ -399,9 +579,9 @@ $\chi_{(r-1)(c-1)}^2=\sum_{i=1}^r\sum_{j=1}^c\frac{(O_{ij}-E_{ij})^2}{E_{ij}}$
 2. 用$\hat p(1-\hat p)$代替方差$\sigma^2$,得到$Z=\frac{\hat p_1-\hat p_2}{\sqrt{\hat p(1-\hat p)(\frac{1}{n_1}+\frac{1}{n_2})}}$
 3. 计算P-Value
 
-# 7. 样本分布检验
+# 10. 样本分布检验
 
-### 7.1 拟合度检验(goodness of fit)
+### 10.1 拟合度检验(goodness of fit)
 
 通过样本构造cdf: $F_n(x)=\frac{1}{n}\sum\mathbb I(X\geq x)\rightarrow F_X(x)$
 
@@ -432,7 +612,7 @@ $$
    $$
    
 
-### 7.2 ANOVA (多总体方差分析)
+### 10.2 ANOVA (多总体方差分析)
 
 ##### 基本定义
 
