@@ -220,32 +220,54 @@ $$
   P(w,d)=P(d)\sum_{z\in\text{topics}}P(w|z)P(z|d)=\sum_{z\in\text{topics}}P(z)P(d|z)p(w|z)
   $$
 
-- 
-
-- 已知单词和文档出现的概率$P(w,d)$和先验分布$p(z)$因此可以使用MLE和EM来估计$P[w|z]$和$p[d|z]$
+- 已知单词和文档出现的概率$P(w,d)$和topic先验分布$p(z)$因此可以使用MLE和EM来估计$P[w|z]$和$p[d|z]$
 
   1. 计算topic在不同文档和主题下出现的概率
      $$
      P(z|d,w)=\frac{P(z)P(d|z)P(w|z)}{\sum_{z'\in Z}P(z')P(d|z')P(w|z')}
      $$
 
-  2. 
-
   2. 用极大似然估计更新单词在主题下出现的概率和主题在文档下出现的概率
      $$
      P(w|z)=\frac{\sum_dn(d,w)P(z|d,w)}{\sum_{d,w'}n(d,w')P(z|d,w')}\\
      P(d|z)=\frac{\sum_wn(d,w)P(z|d,w)}{\sum_{d,w'}n(d,w')P(z|d,w')}
      $$
-
+  
 - 容易过拟合,且无法用训练结果给新文档分类
 
 ##### <u>LDA (Latent Dirichlet Allocation)</u>
 
 - 对于文本在不同topic下的分类结果,赋予一个多维狄拉克先验分布,从而能够给新文档分类
-- asda
-  1. 从先验分布中,随机生成topic的分类结果$\theta$
-  2. 从样本中随机采样一个单词$w_i$
-  3. 根据$\theta$获得topic中单词的分布$p(w_i|\theta)$
+
+- 本质是通过Gibbs采样求每篇文档下的topic后验分布,后验分布的期望即每个主题的概率
+
+- 生成文档流程
+
+  1. 根据topic的Dirichlet分布$\vec\alpha$,生成多项分布概率$\vec \theta_z$ (长度为topic数的向量)
+
+  2. 把$\theta_z$作为多项分布的参数,生成每个单词的主题序列$\vec z_m$(长度为单词数的向量)
+
+  3. 根据每个topic下单词的Dirichlet分布$\vec\beta$,生成单词在该topic下的多项分布概率$\vec \varphi_c$ (长度为单词数的向量)
+
+  4.  把$\vec \varphi_c$作为多项分布的参数,生成对应主题中的单词序列$\vec w_m$
+
+  5. 则有文档生成概率
+     $$
+     p(\vec w_m,\vec z_m,\theta_z,\varphi_z|\vec\alpha,\vec\beta)=\prod_{m=1}^M p(\vec w_m|\vec\varphi_z)p(\vec z_m|\vec\theta_z)p(\vec\theta_z|\vec\alpha)p(\vec\varphi_z|\vec\beta)
+     $$
+
+- 训练模型流程
+
+  1. 对文档中的每个单词随机分配主题$z$
+
+  2. 计算每个单词/主题在其他单词主题下的条件概率
+
+  3. <u>基于基于$n_{d,z}$(文档$d$中主题$z$数)和$v_{z,w}$(主题$z$中单词$w$数)构造条件概率对每个单词重新进行采样,采样前要将对应的计数-1</u>(本质是Gibbs采样)
+     $$
+     p(w=z)=\frac{n_{d,z}+\alpha_z}{\sum_{i}^Zn_{d,i}+\alpha_i}\frac{v_{z,w}+\beta_w}{\sum_i^Wv_{z,i}+\beta_i}=\theta_{d,z}\varphi_{z,w}
+     $$
+
+  4. 重复直到收敛,对采样计数获得$p(\vec w_m|\vec\varphi_z)$和$p(\vec z_m|\vec\theta_z)$
 
 # 4. Part of Speech词性标注
 
@@ -536,3 +558,94 @@ def CKYparse(words, grammer):
 - 找到MST使得边的得分最高(即分类效果最好) $\arg\max_t score(t,S)=\sum_{e\in t}score(e)$
 
 - 每个edge的score由单词距离,
+
+# 7. Machine Translation
+
+### 7.1 Sequence to Sequence Model
+
+##### Overview
+
+- 输入和输出的长度不同,例如翻译后的单词数不一定相同
+- 通过两个模型,encoder将输入编码成隐状态,decoder解码隐状态输出单词,两个模型都可以是RNN
+- decoder输出前,遍历所有可能的输出结果(输出向量+隐状态),经过softmax后,生成概率最大结果
+
+##### 工作流程 
+
+1. 训练encoder模型接受序列输入
+2. 将第一个encoder模型输出的隐状态作为输入的语义编码$S$
+3. 训练第二个decoder模型,接受语义编码,给出翻译结果
+4. 对于每个翻译单词$X_t$决定于语义编码和自身的上一个输出$X_t=f(S, S_{t-1})$
+5. 当输出终止符时,输出结束
+
+##### Problem
+
+- 需要遍历结果,计算量大
+- 容易陷入重复输出(输出向量和隐状态生成相同的结果)
+- 不好处理未见过的单词,且隐状态向量的长度限制了输入范围
+
+##### 模型训练
+
+- 模型上一个时刻错误输出$X_{t-1}$,会导致错误的输入和当下错误输出$X_{t}$,产生差错的蝴蝶效应
+
+- Scheduled Sampling: 在训练时,通过一定概率选择上一时刻输出$X_{t-1}$和正确结果$Y_{t-1}$作为该时刻输入
+
+### 7.2 Attention Mechanism
+
+##### Overview
+
+- 通过对于输入中的不同部分添加权重,来模拟attention的过程
+- 训练一个向量$V$,作用于输入,再通过softmax函数生成每个点的关注度$P(X)=\sigma(VX)$
+- 将关注度作为权重,作用于原输入,关注度较高的向量会因为高权重,扮演重要作用 $X'=P(X)X=\sigma(VX)X$
+
+##### 优化
+
+- 使用不同的$V$和不同的输入方式,例如添加非线性层
+- 训练多个$V$进行多层次作用
+- 对于整句embedding进行Attention后再对单词进行embedding
+
+##### <u>在Seq2Seq模型中的应用</u>
+
+- decoder不光接受encoder的最终输出,而是保存encoder所有时刻的输出$H$
+
+- decoder在解码时,根据上一次自身的隐状态输出$h_{t-1}$计算和encoder所有输出$H$的注意力,并重新构造隐状态输入$c_{t-1}=\sigma(h_{t-1}\cdot H)H$
+
+- 将新的隐状态输入$c_{t-1}$和上一次的隐状态输出$h_{t-1}$一起作为输入,生成下一个输出$h_{t}=f(c_{t-1}, h_{t-1})$
+- 通过注意力机制,可以获得decoder在encoder输入信息中的焦点,提供可视化
+
+### <u>7.3 Transformers</u>
+
+##### Self-Attention
+
+1. 对输入的词向量额外添加位置编码信息
+2. 通过训练的三个权重矩阵$W_q,W_k,W_v$,生成对应矩阵$Q=W_qX,K=W_kX,V=W_vX$
+3. 使用每个单词$i$自身的Query矩阵$Q_i$和其他所有单词的Key矩阵$K_j$生成$i$单词对$j$单词的注意力,并使用softmax归一化 $e_{ij}=\sigma(\frac{Q_iK_j^T}{\sqrt D})$
+4. 使用归一化的结果,对单词的value矩阵$V_i$分配权重,生成新的输入向量
+5. 对于新的输入向量,进行残差相加,再通过一层全连接神经网络输出
+
+##### Encoder/Decoder中应用
+
+- Encoder和Decoder可以通过自连接,反复进行self attention操作,但是数量必须相等
+- Encoder和Decoder都会对输入单词进行self attention操作
+- Encoder最终可以并行的生成每个单词经过self attentation后的向量,并交给decoder作为输出
+
+##### 优化总结
+
+- 对每个单词的原始输入进行权重变换,从而使得$e_{ij}$的结果更均匀,否则$X_iX_i^T$的值会远大于$X_iX_j^T$
+- softmax前除以$\sqrt D$可以减小$\sigma$的输入值,从而增加反向传播的梯度
+
+- 可以训练多组$W_q,W_k,W_v$并反复进行self attention来捕获更多信息
+
+### 7.4 BERT
+
+##### Overview
+
+- Bert本质上是使用Transformers机制的encoder,给定单词在句层面,词义层面和位置的embedding信息,可以输出multi attention转化后的单词向量
+- 通过在Bert输出结果之后添加网络层,使其应用于不同的NLP任务
+
+##### Training
+
+- MLM非监督学习: 通过给Bert输入单词被Mask后的语句,使模型生成原单词
+- NSP非监督学习: 通过给Bert输入两句句子,使模型判断两句句子是否是紧挨着的
+
+
+

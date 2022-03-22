@@ -199,10 +199,6 @@ $$
   - 计算$\text{rank}(x_i)$和$\text{rank}(y_i)$的$\rho$,因此如果对两个变量作用单调函数$\rho_s$不变
   - $\hat\rho_s=\frac{12}{n(n^2-1)}\sum(\text{rank}(x_i)-\frac{n+1}{2})(\text{rank}(y_i)-\frac{n+1}{2})$
 
-​		
-
-
-
 # 3. 单变量分布
 
 ### 3.1 伯努利过程

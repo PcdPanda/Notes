@@ -30,3 +30,31 @@ conda install -c conda-forge jupyter_nbextensions_configurator
 jupyter nbextension enable hinterland/hinterland
 ```
 
+- 配置text wrapping
+
+```json
+vim /home/panda/.jupyter/nbconfig/notebook.json
+
+{
+  "MarkdownCell": {
+    "cm_config": {
+      "lineWrapping": true
+    }
+  },
+  "CodeCell": {
+    "cm_config": {
+      "lineWrapping": true
+    }
+  }
+}
+```
+
+- 配置wsl交换空间
+
+```
+[wsl2]
+memory=10GB
+swap=10GB
+localhostForwarding=true
+```
+

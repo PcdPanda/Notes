@@ -338,14 +338,14 @@ $$
 
 - <u>本质是接受率恒为1的M-H采样,大幅提高在高维空间中采样的效率</u>
 
-- 对于采样结果$X_t=[\alpha_t,\beta_t,\gamma_t,\cdots]$,每个维度的采样,都会依赖于上其他维度的采样结果
+- 当多维分布$p(X)$很难采样,但是每个维度的条件分布很好采样的场合使用,使用条件分布$p(x_i|x_1,x_2\cdots x_n)$作为状态转移分布$P(x)$
 
   1. $\alpha_{t+1}\sim P(\alpha|\beta_t,\gamma_t,\cdots)$
 
   2. $\beta_{t+1}\sim P(\beta|\alpha_{t+1},\gamma_t,\cdots)$
   3. $\gamma_{t+1}\sim P(\gamma|\alpha_{t+1},\beta_{t+1},\cdots)$
 
-- 令条件分布$P(\alpha|\beta_t,\gamma_t,\cdots)$作为状态转移概率,则满足平稳分布
+- 对于采样结果$X_t=[\alpha_t,\beta_t,\gamma_t,\cdots]$,每个维度的采样,都会依赖于上其他维度的采样结果,此时满足平稳分布
   $$
   p(\alpha_1,\beta_1,\gamma_1)P(\alpha_2|\beta_1,\gamma_1)=P(\alpha_1|\beta_1,\gamma_1)p(\beta_1,\gamma_1)P(\alpha_2|\beta_1,\gamma_1)=p(\alpha_2,\beta_1,\gamma_1)P(\alpha_1|\beta_1,\gamma_1)
   $$
