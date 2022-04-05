@@ -24,7 +24,8 @@
 可以服从正态分布/伯努利分布/三角函数等
 
 - 任何时间点的均值都为0 (没有趋势)
-- 没有自相关性 $\rho_h=0\quad\forall h$
+- 弱白噪音: 没有自相关性 $\rho_h=0\quad\forall h$
+- 强白噪音: 完全不相关
 
 ### 1.2 平稳性 (Stationary)
 
@@ -497,6 +498,8 @@ $$
   - $L_n=L_{n-1}+T_{n-1}+\xi_n$
   - $T_n=T_{n-1}+\eta_n$
 
+### 4.5 POMP Inference
+
 ##### HP Filter
 
 - 对于给定观测序列$Y_t$,假设$Y_t$的平滑输出$X_t$是序列的隐状态
@@ -512,11 +515,11 @@ $$
 
 ##### <u>Kalman Filter</u>
 
-- 假设观测值只和当前状态有关,即$P[Y_t|X_t,U_t,X_{t-1}]=P[Y_t|X_t],P[Y_t|X_{t-1},U_t]=P[Y_t]$
+- 观测值只和当前状态有关,即$P[Y_t|X_t,U_t,X_{t-1}]=P[Y_t|X_t],P[Y_t|X_{t-1},U_t]=P[Y_t]$
 - 常用于控制论,根据观测状态$y_{t}$,控制操作$u_t$,上一个隐状态分布$x_{t-1}$来获得当前隐状态分布$f_{X_t|Y_t,X_{t-1},U_t}(x_t|y_t,x_{t-1},u_{t-1})$服从正态分布
 
 $$
-P[X_t|Y_t,X_{t-1},U_t]=\frac{P[X_t,Y_t,X_{t-1},U_t]}{P[Y_t,X_{t-1},U_t]}=\frac{P[Y_t|X_t,U_t,X_{t-1}]P[X_t|X_{t-1},U_t]}{P[X_{t-1},U_t]P[Y_t|X_{t-1},U_t]}=\frac{P[Y_t|X_t]P[X_t|X_{t-1},U_t]}{P[Y_t]}
+P[X_t|Y_t,X_{t-1},U_t]=\frac{P[X_t,Y_t,X_{t-1},U_t]}{P[Y_t,X_{t-1},U_t]}=\frac{P[Y_t|X_t,U_t,X_{t-1}]P[X_t|X_{t-1},U_t]}{P[Y_t|X_{t-1},U_t]}=\frac{P[Y_t|X_t]P[X_t|X_{t-1},U_t]}{P[Y_t]}
 $$
 
 - <u>线性变换模型转换方程</u>
@@ -525,3 +528,40 @@ $$
   | -------- | ----------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
   | 定义     | 隐状态预测分布均值$\mathbb{E}[X_{t+1}|Y_{1:t}]$ | 隐状态预测分布方差                                           | <u>隐状态filter均值</u> $\mathbb{E}[X_{t}|Y_{1:t}]$          | 隐状态filter方差                                             |
   | 转换方程 | $\mathbb A_{t+1}\mu_t^F(y_{1:t})$               | $\mathbb A_{t+1}\Sigma_t^F\mathbb A_{t+1}^T+\mathbb U_{t+1}$ | $([\Sigma_t^P]^{-1}+\mathbb B_t^T\mathbb V_t^{-1}\mathbb B_t)^{-1}$ | $\mu_t^Py_{1:t-1}+\Sigma_t^F\mathbb B_t^T\mathbb V_t^{-1}(y_t-\mathbb B_t\mu_t^Py_{1:t-1})$ |
+
+##### <u>Particle Filter</u>
+
+- 已知状态转换概率模型$p(x_n|x_{n-1};\theta)$和观测概率模型$p(y_n|x_n;\theta)$<u>计算POMP时间序列数据隐状态的似然函数,通过比较不同$\theta$下的似然函数来选择参数</u>
+  $$
+  L(\theta)=\prod_{n=1}^Np(y_n^*|y_{1:n-1}^*;\theta)=\prod_{n=1}^N\int p(y_n^*|x_n;\theta)p(x_n|y^*_{1:n-1};\theta)\mathrm dx_n
+  $$
+
+- Prediction Formula: 基于之前观测状态$Y_{1:n-1}$获得下一个隐状态$X_n$的概率
+  $$
+  p(x_n|y_{1:n-1}^*;\theta)=\int p(x_n|x_{n-1};\theta)p(x_{n-1}|y_{1:n-1}^*;\theta)\mathrm dx_{n-1}
+  $$
+
+- Filtering Formula: 基于观测状态$Y_{1:n}$获得当前隐状态$X_n$的概率
+  $$
+  p(x_n|y_{1:n}^*;\theta)=\frac{p(x_n,y_n,y_{1:n-1};\theta)}{p(y_n,y_{1:n-1};\theta)}=\frac{p(y_n|x_n;\theta)p(x_n|y_{1:n-1};\theta)}{\int p(y_n|x_n;\theta)p(x_n|y_{n-1};\theta)\mathrm dx_n}
+  $$
+
+- 对于每个$x_n$相互迭代Prediction和Filtering可以分别计算两个概率
+  1. Prediction: 基于步骤3(如果$n=0$可以根据预设初始值)预测$J$个$n$时刻的预测(Prediction)样本$x_{n,j}^P$
+  2. Filtering: 基于$t=n$时刻的真实观测值$Y_t$,在预测状态下出现的概率,对每个预测状态计算权重$w_{t,j}=p(y_t|x_{t,j}^P;\theta)$,并根据权重重新采样获得$x_{t,j}^F$
+  3. 根据采样获得的$x_{t,j}^F$进行状态转换,获得$J$个对下一个时刻的预测$x_{t+1,j}^P$
+  4. 使用观测值$y_n$在$J$个采样状态$x_{n,j}$下的出现频率,可以对$p(y^*_n|y^*_{1:n-1};\theta)$进行估计$\hat l_n(\theta)\approx\frac{1}{J}\sum p(y^*_n|x_{n,j}^P)$
+  5. 将所有时间点的似然函数相加,就是总序列的似然函数$\hat L(\theta)=\sum\log \hat l_n(\theta)$
+
+##### <u> </u>
+
+- 基于反复的Particle Filtering来对参数$\theta$进行迭代式的极大似然估计
+- 每次迭代后,会对$\theta$<u>添加扰动项</u>,类似遗传算法,再使用新的参数来进行估计
+
+- 迭代流程:
+  1. 预设迭代次数$M$和粒子数量$J$,针对每一个粒子生成一个模型参数$\theta_j$
+  2. 使用模型参数$\theta_j$生成$J$个预测样本$x_{0,j}^F$
+  3. 进入时间序列,对每个参数$\theta_j$施加扰动项获得新的参数$\theta_j'$
+  4. 基于参数$\theta_j'$进行$t=n$时刻粒子滤波
+  5. 基于粒子滤波中获得的权重,对对应的参数$\theta_j'$重新采样$J$个参数
+  6. 时间序列采样完成后,减小扰动幅度,从2重新开始
