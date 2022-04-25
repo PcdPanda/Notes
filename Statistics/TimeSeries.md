@@ -86,7 +86,7 @@ $$
 - 两个特定时间点之间的协方差: $\gamma_{m,n}=\mathbb{E}[(Y_m-\mu_m)(Y_n-\mu_n)]$
 - 需要考虑<u>时间序列数据上任意点</u>和前后间隔$h$个时间点的样本的关系,只有<u>都相同才说明方差平稳,此时自方差有意义</u>
 
-##### 自方差
+##### 自方差 
 
 - 只有在方差平稳时才有意义,此时$\gamma_h=\gamma_{n,n+h}\quad\forall n$
 
@@ -114,16 +114,6 @@ $$
 
 - <u>只有在方差平稳时,这个数值才有意义</u>
 
-### 1.5 ACF检验 (Box-Ljung Tests)
-
-##### 检验流程
-
-1. 画出不同阶$h$的自相关系数ACF
-2. 和null hypothesis (无自相关性)的置信区间对比,判断模型是否平稳
-3. 如果有$h$阶的ACF超过区间,可能有周期/时序相关信息可以捕捉
-
-##### ACF数据特征
-
 - 当时间序列很长时,ACF的置信区间会变得很狭窄,这个时候小波动容易造成模型不平稳,因此<u>去极值很重要</u>
 - 尾部特征: 截尾(ACF突然变为0)/拖尾(随着$h$增加,ACF逐步变为0)
 
@@ -135,6 +125,38 @@ $$
   $$
   X_t=\phi_{0,h}+\phi_{1,h}X_{t-1}+\cdots\phi_{h,h}X_{t-h}\quad t=h+1,\cdots,N
   $$
+
+### 1.5 残差检验
+
+##### ACF检验(Box-Ljung Test)
+
+1. 画出不同阶$h$的自相关系数ACF
+2. 和null hypothesis (无自相关性)的置信区间对比,判断模型是否有自相关性($H_0$: 数据无自相关,即$\gamma(h)=0\quad\forall h$)
+3. 如果有$h$阶的ACF超过区间,可能有周期/时序相关信息可以捕捉
+
+$$
+X_t=\phi_{0,h}+\phi_{1,h}X_{t-1}+\cdots\phi_{h,h}X_{t-h}\quad t=h+1,\cdots,N
+$$
+
+##### 平稳性检验Phillips-Perron Test
+
+- 使用ARMA拟合数据来进行检验
+- $H_0$:单位圆内存在单位根,数据不平稳
+- $H_1:$数据平稳,因此P-value越小越好
+
+##### Jarque-Bera检验正态分布
+
+- 通过样本的偏度$S$和峰度$K$来构造参数检验
+  $$
+  JB=\frac{n}{6}(S^2+\frac{(K-3)^2}{4})\sim\chi^2_2
+  $$
+
+- $H_0$:数据服从正态分布,$JB$值越偏离$\chi^2_2$,说明样本正态分布的概率越小
+
+##### Shapiro-Wilk Test
+
+- 检验样本是否服从假设的正态分布,分布参数决定$\alpha_i$
+- $W=\frac{(\sum_{i=1}^n\alpha_ix_i)^2}{\sum_{i=1}^n(x_i-\bar x)^2}$
 
 # 2. ARMA模型
 
@@ -158,11 +180,11 @@ $$
 Y_n=\phi_1Y_{n-1}+\phi_2Y_{n-2}+\cdots\phi_{p}Y_{n-p}+\epsilon_n
 $$
 
-- 定义函数$\phi(x)=1-\phi_1x-\phi_2x^2-\cdots-\phi_px^p$,则可以用算符简化$\phi(B)Y_n=\epsilon_n$
-
-- 第$n$个时间点的值,是前$p$个点的线性组合
-- 需要初始化前$p$个值
+- 定义函数$\phi(x)=1-\phi_1x-\phi_2x^2-\cdots-\phi_px^p$,则可以用算符简化$\phi(B)Y_n=\epsilon_n,\epsilon_n\sim N(0,\sigma^2)$
+- 第$n$个时间点的值,是前$p$个点的线性组合,需要初始化前$p$个值才可以计算
 - <u>通常设定模型弱平稳</u>,则$\mathbb{E}[Y_n]=0$
+
+- 方差 $\sigma_Y^2=\frac{\sigma^2}{1-\sum_{i=1}^p\phi_i^2}$
 
 ##### Random Walk
 
@@ -172,7 +194,6 @@ $$
 ##### Random Walk with Drift
 
 - Random Walk的基础上添加了increments: $Y_n=Y_{n-1}+\mu+\epsilon$
-  
 - 有效市场假说暗示对数收益率服从random walk with drift
 
 ##### 1阶因果AR模型收敛性
@@ -181,8 +202,43 @@ $$
 
 - Causal Solution ($Y$由过去决定): $Y_n=\sum_{j=0}^\infty\phi^j\epsilon_{n-j}$
 - Non-causal Solution ($Y$由未来决定): $Y_n=\sum_{j=0}^\infty\phi^{-j}\epsilon_{n+j}$
-
 - <u>等比数列比值绝对值小于1才可以收敛</u>
+
+##### 线性拟合求参数
+
+- 假定$Y_t$和$Y_{t-1},\cdots,Y_{t-p}$<u>服从多元正态分布,因此可以直接使用线性回归</u>来最小化$MSE$并估计参数
+
+- 构造自方差矩阵
+  $$
+  \Sigma_Y=\begin{bmatrix}\gamma(0)&\cdots&\gamma(n-1)\\\cdots&\cdots&\cdots\\\gamma(n-1)&\cdots&\gamma(0)\end{bmatrix}
+  $$
+
+- 构造协方差向量
+  $$
+  \Sigma_{Y_n,Y_{n-p:n-1}}=\begin{bmatrix}\gamma(p),\cdots,\gamma(1)\end{bmatrix}
+  $$
+
+- 可以生成预测模型$\hat Y_{t}=\Sigma_{Y_n,Y_{n-p:n-1}}\Sigma_Y^{-1}(Y_{n-p:n-1}-\mu)+\mu$
+
+##### 矩量法求参数(Yule-Walker)
+
+- 基于自方差定义,可以得到方程组
+  $$
+  \gamma(0)=\sum_{i=1}^p\phi_i\gamma(|i|)+\sigma^2\\
+  \gamma(1)=\sum_{i=1}^p\phi_i\gamma(|i-1|)\\
+  \cdots\\
+  \gamma(p)=\sum_{i=1}^p\phi_i\gamma(|i-p|)
+  $$
+
+- 带入自方差估计值$\hat\gamma$求得$\sigma$和$\phi_i$
+
+##### Conditional MLE估计参数
+
+- 对于$X_p,X_{p-1},\cdots X_0$, 有$X_p^2-\alpha_0-\alpha_1X_{p-1}^2-\cdots\alpha_p X_0^2=\epsilon_n\sim N(0,\sigma^2)$,因为残差服从独立正态分布,因此可以计算联合似然函数
+  $$
+  f(\alpha,\sigma^2|X)=\prod_{i=p+1}^n\frac{1}{\sqrt{2\pi\sigma}}\exp[-\frac{1}{2}(\frac{X_i-\sum_{j=1}^p\alpha_jX_{i-j}}{\sigma})^2]
+  $$
+  
 
 ### 2.3 MA(移动平均)模型
 
@@ -192,28 +248,23 @@ $$
 Y_n=\epsilon_n+\psi_1\epsilon_{n-1}+\cdots+\psi_q\epsilon_{n-q}
 $$
 
-
-
 - 定义函数$\psi(x)=1+\psi_1x+\psi_2x^2+\cdots+\psi_qx^q$,则可以用算符简化$Y_n=\psi(B)\epsilon_n$
-
 - 第$n$个时间点的值,是前$q$个残差的线性组合
 - 不需要定义初始值$Y_0$,只要有$\epsilon$分布就可以决定$Y_n$
+- 使用MA项可以有效拟合时序数据中的自方差
 
-##### 自相关系数
+##### 自相关性
 
-$$
-Y_n=\mu+g_0\epsilon_n+g_1\epsilon_{n-1}+\cdots
-$$
+- $\sigma_Y^2=\sigma^2\sum_{i=0}^q\psi_i^2,\rho(h)=\sigma^2\sum_{i=0}^{q-h}\psi_i\psi_{i+h}$
 
-- 因为有无穷项,所以不需要有初始值,只有$g_n$就可以决定$Y$的结果
+- $\gamma(h)=\sigma^2\sum_{i=0}^{q-h}\psi_i\psi_{i+h}$
 
-- 自相关系数收敛性
+- 无穷项时,不需要有初始值,只有$\psi_n$就可以决定$Y$的结果,此时自相关系数收敛
   $$
-  \gamma_h=\text{Cov}(\sum_{j=0}^\infty g_j\epsilon_{n-j},\sum_{k=0}^\infty g_k\epsilon_{n+h-k})=\sum_{j=0}^\infty\sum_{k=0}^\infty g_jg_k\text{Cov}(\epsilon_{n-j}\epsilon_{n+h-k})
+  \gamma_h=\text{Cov}(\sum_{j=0}^\infty \psi_j\epsilon_{n-j},\sum_{k=0}^\infty \psi_k\epsilon_{n+h-k})=\sum_{j=0}^\infty\sum_{k=0}^\infty \psi_j\psi_k\text{Cov}(\epsilon_{n-j},\epsilon_{n+h-k})
   $$
-  只有当$k=j+h$的时候$\text{Cov}(\epsilon_k\epsilon_j)=\sigma^2$,否则为0
+  只有当$k=j+h$的时候$\text{Cov}(\epsilon_k\epsilon_j)=\sigma^2$,否则为0, 因此$\gamma_h=\sum_{j=0}^\infty\psi_j\psi_{j+h}$, 即$\sum_0^{\infty}|\psi_j|<\infty$才有自相关性
   
-  因此$\gamma_h=\sum_{j=0}^\infty g_j^2$, 即$\sum_0^{\infty}|g_j|<\infty$才有自相关性
 
 ### 2.4 ARMA模型
 
@@ -227,6 +278,12 @@ $$
 - 使用算符简化,如果两<u>边可以消元,这说明可以化简为更简单的ARMA模型</u>: $\phi(B)Y_n=\psi(B)\epsilon_n$
 
 - <u>拟合效果往往比单独使用AR或者MA更准确,但是有时候需要去除平均数</u>
+
+- 方差
+  $$
+  \sigma_Y^2=\frac{1+\sum_{i=1}^q\psi_i^2+2\sum_{i=1}^{\min(p,q)}\psi_i\phi_i}{1-\sum_{i=1}^p\phi_i^2}\sigma_\epsilon^2
+  $$
+  
 
 ##### 因果性分析
 
