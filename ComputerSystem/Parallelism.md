@@ -604,7 +604,7 @@ $T_0,T_1$的延时可以通过pipeline隐藏,<u>通常带宽最终成为瓶颈</
 ##### CAS Based Lock
 
 ```c++
-// 上锁: 不断进行原子操作,知道可以得到1为止,代表上锁成功
+// 上锁: 不断进行原子操作,直到可以得到1为止,代表上锁成功
 while(compare_and_swap(lock, 1)); 
 // 解锁
 lock = 0;
@@ -705,7 +705,7 @@ lock->status[my_ticket++] = 1; // 交下一个号
 ##### 功能
 
 - 使得<u>多个Thread在Barrier前同步</u>
-- 需要考虑线程切换和同步开销. 如果Thread 1释放后又执行Barrier,需要让Thread 2知道之间中间的Barrier已经完成
+- 需要考虑线程切换和同步开销. 如果Thread 1释放后又执行Barrier,需要让Thread 2知道中间的Barrier已经完成
 
 ##### Implementation
 

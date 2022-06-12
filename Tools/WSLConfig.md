@@ -34,6 +34,7 @@ vim /home/panda/.jupyter/jupyter_notebook_config.py
 
 ```shell
 conda install -c conda-forge jupyter_nbextensions_configurator
+conda install -c conda-forge jupyter-resource-usage
 jupyter nbextension enable hinterland/hinterland
 ```
 

@@ -36,7 +36,7 @@ Host cdpan # 登录机器名
 
 ### 1.2 自定义环境配置
 
-在.bashrc中可以加入bash命令,在进入shell时预运行,起到环境变量的作用
+在.bash_profile/.bashrc中可以加入bash命令,在进入shell时预运行,起到环境变量的作用
 
 ##### Alias:
 
@@ -53,6 +53,9 @@ export PATH={PATH}:$PATH # 自定义环境变量路径
 ##### Crontab
 
 ```sh
+service cron status # 确认crontab一打开
+sudo service cron start
+sudo vim /etc/rsyslog.d/50-default.conf # 开启日志
 crontab -l # 打印定期任务
 crontab -e # 编辑定期任务
 
@@ -352,7 +355,7 @@ git用引用来指向SHA-1值,并在上传时附加引用
 ```sh
 git init # 初始化git目录
 git config --global credential.helper store # 配置存储模式
-git config --global user.email "panda@panchongdan@foxmail.com" # 配置email
+git config --global user.email "panchongdan@foxmail.com" # 配置email
 git config --global user.name "Chongdan Pan" # 配置用户名
 git config --global https.proxy https://127.0.0.1:41091 # 设置代理
 git config --global http.proxy http://127.0.0.1:41091 # 设置代理
