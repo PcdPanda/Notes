@@ -198,7 +198,7 @@ $$
 ##### Radix Sort
 
 - 先按照最后一位排序，再往前
-- **使用count sort对每一位数字排序**
+- <u>使用count sort对每一位数字排序</u>
 
 ### 2.3 Random Select
 

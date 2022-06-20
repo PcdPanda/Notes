@@ -1,3 +1,7 @@
+[toc]
+
+
+
 # C重点
 
 #### 1. 关键字
@@ -50,11 +54,18 @@
   int * (*f[5])(int, double) // f是一个长度为5的数组,元素是函数指针,这个函数返回int*
   ```
 
-  
 
 #### 4. 符号
 
 字符串末尾是'\0' 
 
+# C++
 
+### 1.常用工具
+
+##### 在线debug
+
+[C++ Compiler Explorer](https://godbolt.org/)
+
+[C++ Insights](https://cppinsights.io/)
 
