@@ -27,39 +27,54 @@
         - [5.2 圆锥曲线](#52-圆锥曲线)
         - [5.3 离心率](#53-离心率)
         - [5.4 极坐标下的圆锥曲线](#54-极坐标下的圆锥曲线)
-    - [6. 无穷级数](#6-无穷级数)
-        - [6.1 数列](#61-数列)
-        - [6.2 级数](#62-级数)
-        - [6.3 收敛性判断](#63-收敛性判断)
-        - [6.4 级数数值估计](#64-级数数值估计)
-        - [6.5 条件收敛](#65-条件收敛)
-        - [6.6 幂级数](#66-幂级数)
-        - [6.7 泰勒级数](#67-泰勒级数)
-    - [7. 积分应用](#7-积分应用)
-        - [7.1 线积分(弧长)](#71-线积分弧长)
-        - [7.2 面积分](#72-面积分)
-        - [7.3 体积表面积分](#73-体积表面积分)
-        - [7.4 体积分](#74-体积分)
-        - [7.5 质心](#75-质心)
-    - [8. 一阶微分方程](#8-一阶微分方程)
-        - [8.1 方向场和欧拉法](#81-方向场和欧拉法)
-        - [8.2 可分离方程](#82-可分离方程)
-        - [8.3一阶线性方程](#83一阶线性方程)
-    - [9. 二阶微分方程](#9-二阶微分方程)
-        - [9.1 齐次微分方程](#91-齐次微分方程)
-        - [9.2 常系数齐次方程](#92-常系数齐次方程)
-        - [9.3 常系数非齐次方程](#93-常系数非齐次方程)
-        - [9.4 级数法求多项式方程](#94-级数法求多项式方程)
-    - [10. 向量函数](#10-向量函数)
-        - [10.1 常用向量公式](#101-常用向量公式)
-        - [10.2 常用向量组合定义](#102-常用向量组合定义)
-        - [10.3 向量微积分](#103-向量微积分)
-        - [10.4 向量函数$\\bold r(t)$的曲线性质](#104-向量函数bold-rt的曲线性质)
-        - [10.5 曲率](#105-曲率)
-        - [10.6 加速度分解](#106-加速度分解)
-    - [11. 多变量微分](#11-多变量微分)
-    - [12. 多变量积分](#12-多变量积分)
-    - [13. 向量微积分](#13-向量微积分)
+    - [6. 向量函数](#6-向量函数)
+        - [6.1 常用向量公式](#61-常用向量公式)
+        - [6.2 常用向量组合定义](#62-常用向量组合定义)
+        - [6.3 向量微积分](#63-向量微积分)
+        - [6.4 向量函数$\\bold r(t)$的曲线性质](#64-向量函数bold-rt的曲线性质)
+        - [6.5 曲率](#65-曲率)
+        - [6.6 加速度分解](#66-加速度分解)
+    - [7. 多变量函数](#7-多变量函数)
+        - [7.1 多变量函数性质](#71-多变量函数性质)
+        - [7.2 偏导](#72-偏导)
+        - [7.3 梯度和切面](#73-梯度和切面)
+        - [7.4 全微分](#74-全微分)
+        - [7.5 变量代换](#75-变量代换)
+        - [7.6 拉格朗日乘子](#76-拉格朗日乘子)
+    - [8. 多变量积分](#8-多变量积分)
+        - [8.1 区域积分](#81-区域积分)
+        - [8.2 区域积分应用](#82-区域积分应用)
+        - [8.2 积分变量变换](#82-积分变量变换)
+    - [9. 向量微积分](#9-向量微积分)
+        - [9.1 向量场性质](#91-向量场性质)
+        - [9.2 格林公式/斯托克斯定理](#92-格林公式斯托克斯定理)
+        - [9.3 散度定理](#93-散度定理)
+    - [10. 无穷级数](#10-无穷级数)
+        - [10.1 数列](#101-数列)
+        - [10.2 级数](#102-级数)
+        - [10.3 收敛性判断](#103-收敛性判断)
+        - [10.4 级数数值估计](#104-级数数值估计)
+        - [10.5 条件收敛](#105-条件收敛)
+        - [10.6 幂级数](#106-幂级数)
+        - [10.7 泰勒级数](#107-泰勒级数)
+    - [11. 一阶微分方程](#11-一阶微分方程)
+        - [11.1 方向场和欧拉方法](#111-方向场和欧拉方法)
+        - [11.2 可分离方程](#112-可分离方程)
+        - [11.3一阶线性方程](#113一阶线性方程)
+    - [12. 二阶微分方程](#12-二阶微分方程)
+        - [12.1 齐次微分方程](#121-齐次微分方程)
+        - [12.2 常系数齐次方程](#122-常系数齐次方程)
+        - [12.3 常系数非齐次方程](#123-常系数非齐次方程)
+        - [12.4 级数法求多项式方程](#124-级数法求多项式方程)
+    - [13. 积分应用](#13-积分应用)
+        - [13.1 标量函数线积分](#131-标量函数线积分)
+        - [13.2 向量线积分](#132-向量线积分)
+        - [13.3 保守向量场](#133-保守向量场)
+        - [13.4 标量面积分](#134-标量面积分)
+        - [13.5 体积表面积分](#135-体积表面积分)
+        - [13.6 向量场通量积分](#136-向量场通量积分)
+        - [13.5 体积分](#135-体积分)
+        - [13.6 质心](#136-质心)
 
 # Calculus
 ### 1. 极限
@@ -196,31 +211,138 @@ $$r=\frac{ed}{1\pm e\cos\theta},r=\frac{ed}{1\pm e\sin\theta}$$
 - 将$ed=a-ae^2$带入,可以用长轴场表示椭圆曲线
 $$r=\frac{a(1-e^2)}{1\pm e\cos\theta},\frac{a(1-e^2)}{1\pm e\sin\theta}$$
 - 可以通过极坐标改变$\theta$来获得旋转后的椭圆
-### 6. 无穷级数
-##### 6.1 数列
+### 6. 向量函数
+自变量只有一个$t$,应变量是多维向量,例如<$\bold x,\bold y,\bold z$>,有时候$x$可以直接作为$t$
+##### 6.1 常用向量公式
+| $\bold a\cdot\bold b$              	| $\text{comp}_{\bold a}\bold b$             	| $\text{proj}_{\bold a}\bold b$                       	| $\bold a\times\bold b$                                                  	| $\|\bold a\times\bold b\|$         	| $\bold a\cdot(\text{b}\times\text{c})$ 	| $\bold a\times\bold b\times\bold c$$             	|
+|--------------------------------------	|----------------------------------------------	|--------------------------------------------------------	|---------------------------------------------------------------------------	|--------------------------------------	|-----------------------------------------	|-----------------------------------------------------	|
+| $\|\bold a\|\|\bold b\|\cos\theta$ 	| $\frac{\bold a\cdot\bold b}{\|\bold a\|}$ 	| $\frac{\bold a\cdot\bold b}{\|\bold a\|^2}\bold a$ 	| $(a_2b_3-a_3b_2)\bold i-(a_1b_3-a_3b_1)\bold j+(a_1b_2-a_2b_1)\bold k$ 	| $\|\bold a\|\|\bold b\|\sin\theta$ 	| $(\bold a\times\bold b)\cdot\bold c$ 	| $\bold a\bold c\bold b-\bold a\bold b\bold c$ 	|
+##### 6.2 常用向量组合定义
+- 用加权得到连接$\bold r_0$和$\bold r_1$的线段
+$$\bold r(t)=(1-t)\bold r_0+t\bold r_1$$
+- 用参数方程定义经过$(x_0,y_0,z_0)$的曲线,$t$到$(x,y,z)$有唯一映射
+$$\frac{x-x_0}{a}=\frac{y-y_0}{b}=\frac{z-z_0}{c}=t$$
+- 用法向量<$a,b,c$>定义经过$(x_0,y_0,z_0)$的平面
+$$a(x-x_0)+b(y-y_0)+c(z-z_0)=0$$
+- 用二次多项式描述二次曲面,可以令$x,y,z$分量分别等于0来判断曲面在各个子平面中的性质
+##### 6.3 <u>向量微积分</u>
+- 向量函数连续,极限,导数,积分的定义和标量函数相同,只要在每个维度分别判断即可
+- 向量的叉乘,点乘,标量乘法,均服从常规标量的求导法则
+##### 6.4 <u>向量函数$\bold r(t)$的曲线性质</u>
+- 线积分(弧长):方法和标量函数相同,计算每个子线段$dr$和$dt$的关系
+$$L=\int |dr|=\int\sqrt{(\frac{dx}{dt})^2+(\frac{dy}{dt})^2+(\frac{dz}{dt})^2}dt$$
+- 切线单位向量: $\bold T=\frac{\bold r'}{|\bold r'|}$,由于$\bold T$的长度为1,因此$\bold T$和$\bold T'$垂直
+- 法向量: $\bold N=\frac{\bold T'}{|\bold T'|}$,即切线单位向量的梯度方向上的单位向量
+- 副法向量: $\bold B=\bold T\times N$,和$\bold T,\bold N$共同构造了在$\bold r(t)$的坐标系
+##### 6.5 曲率
+- 第一定义: 在$\bold r(t)$点内切圆的半径倒数: $\kappa=\frac{1}{R}$
+- 第二定义: 切线单位向量对弧长变化量的比值: $\kappa=|\frac{d\bold T}{d L}|=\frac{|\bold T'|}{|\bold r'|}$
+- 使用$\bold r'=|\bold r'|\bold T$定义求导后带入获得叉乘表示$\kappa=\frac{|\bold r'\times \bold r''|}{|\bold r'|^3}$,对于标量函数$\kappa=\frac{|f''|}{(1+f'^2)^{2/3}}$
+##### 6.6 加速度分解
+- 加速度$\bold a$可以分解成沿速度分量$v'\bold T$和垂直速度分量$\kappa v^2\bold N$,<u>曲率越大,速度越快,垂直加速度也越快</u>
+$$\bold a=v'\bold T+\kappa v^2\bold N=\frac{|\bold r'\cdot \bold r''|}{||\bold r'(t)||}\bold T+\frac{|\bold r'\times \bold r''|}{||\bold r'(t)||}\bold N$$
+- 当加速度$\bold a$和位移$\bold r$平行时,常用的做法就是让位移和速度叉乘后求导$\frac{d}{dt}(\bold r\times \bold v)=\bold 0$,可以得到$\bold r\times \bold v$是个常量$\bold h$
+### 7. 多变量函数
+##### 7.1 多变量函数性质
+- 定义: 输入是一个向量$\bold x$,输出可以是标量或者向量$f(\bold x)$
+- <u>极限</u>: $\lim_{\bold x\rightarrow \bold x_0}f(\bold x)$,具体值取决于距离$|\bold x-\bold x_0|$的计算方式,<u>从各个方向逼近后的结果相同才说明极限存在</u>
+##### 7.2 偏导
+- 定义: 把$\bold x$中除了$x_0$之外的所有变量$x_i$当做常数,计算对$x_0$的导数$f_{x_0}(\bold x)=\frac{\partial f}{\partial x_0}$. 偏导后的结果也是用$\bold x$描述的多变量函数,因此可以继续求$n$阶偏导
+- <u>Clairaut Theorem</u>: 交换求偏导的变量顺序后,得到的结果不变,即$f_{xy}=f_{yx}$
+##### 7.3 <u>梯度和切面</u>
+- <u>梯度</u>: $f$分别对$\bold x$中的每一项求偏导后获得的向量$\nabla f(\bold x)=[f_{x_{0}}, f_{x_{1}}, \cdots]^T$
+- 有向微分: 给定一个单位向量$\bold u$,则$f(\bold x)$在$\bold u$方向上的微分是$d_{\bold u}f=\lim_{h\rightarrow0} f(\bold x+h\bold u)-f(\bold x)=\nabla f\cdot\bold u$
+- 等值面: 对于用参数方程$f(\bold x)=k$描述的曲面,$\nabla f(\bold x_0)$是该曲面在$\bold x_0$处的法向量,并且可以基于法向量<u>构建切面</u>$T(\bold x)=\nabla f\cdot(\bold x-x_0)=0$
+- <u>高维导数矩阵$H_k$</u>: 对于$n$个变量的$k$阶导数,$H_k$是维度为$[n, n, \ldots, n]_{1 \times k}$,比如二阶导数矩阵$H_{ij}=\frac{\partial f}{\partial x_i \partial x_j}$.
+- 极值点: 首先$f_{x_i}$必须都等于0,随后判断$D=|H_2|$,如果$D>2$则极值点成立,否则是鞍点
+##### 7.4 全微分
+- <u>高维泰勒展开</u>: 由于算力原因,通常只使用二阶展开,展开函数同时构成了在$\bold x_0$处的切面
+$$f(\bold{x})=f(\bold{x_0})+\nabla f(\bold{x_0})\cdot(\bold{x}-\bold{x_0})+\frac{1}{2!}(\bold{x}-\bold{x_0})^TH_f(\bold{x_0})(\bold{x}-\bold{x_0})+\ldots$$
+- <u>全微分</u>: 当$\bold x\rightarrow \bold x_0$时,展开中的高次项可以消除,因此得到$df=\nabla f\cdot d\bold x$,对于二维情况,有
+$$df=f_x dx+f_ydy$$
+##### 7.5 变量代换
+- 当$\bold x$可以用新的自变量$\bold t$描述是,则需要<u>全微分后</u>使用链式法则代换,得到的新向量为$[f_{t_0},f_{t_1},\ldots]$
+$$f_{t_0}=f_{x_0}\frac{\partial x_0}{\partial t_0}+f_{x_1}\frac{\partial x_1}{\partial t_0}+\cdots$$
+- 当自变量为$x,y$且可以用隐函数$f(x, y)=0$描述$x, y$关系时,把$x_1=t_0=y$带入可以快速计算$\frac{dy}{dx}=-\frac{f_y}{f_x}$
+- 当$z=f(\bold x)$并可以用隐函数$F(\bold x, z)=0$描述$f(\bold x)$时可以快速计算$\frac{\partial z}{\partial x_i}=-\frac{F_{x_i}}{F_z}$
+##### 7.6 <u>拉格朗日乘子</u>
+1. 给定$k$个$g_k(\bold x)=0$的约束,需要求$f(\bold x)$的极值
+2. 在极值点,$f(\bold x)$的梯度$\nabla f$必然与$g_k(\bold x)$的切面垂直
+3. 由于每个$g_k(\bold x)=0$的梯度$\nabla g_k$同样与切面垂直,因此$\nabla f=\sum\lambda_k\nabla g_k$
+4. 对于$n$维空间,梯度关系可以获得$n$个方程,$k$个曲面约束可以获得$k$个方程,刚好可以解得$\bold x$和$\lambda_k$
+### 8. 多变量积分
+##### 8.1 区域积分
+- 如果积分函数可分离,即$f(x,y)=g(x)h(y)$,则区域积分可以拆分为分步积分乘积
+$$\int\int f(x,y)dxdy=\int g(x)dx\cdot\int h(y)dy$$
+- 对于立方体/长方形积分,可以交换积分顺序
+$$\int_a^b\int_c^df(x,y)dxdy=\int_c^d\int_a^bf(x,y)dydx$$
+- 在$z=[g_1(x,y), g_2(x,y)], y=[h_1(x) h_2(x)],x=[a,b]$围成的区域对于$f(x,y,z)$求积分
+$$\int_a^b\int_{h_1(x)}^{h_2(y)}\int_{g_1(x,y)}^{g_2(x, y)}f(x,y,z)dzdydx$$
+##### 8.2 区域积分应用
+- $f(\bold x)=1$: 积分得到面积/体积
+- $f(\bold x)=\rho$: 获得质量,
+- $f(\bold x)\rho x$获得在$x$上的质心
+- $f(\bold x)\rho r^2$获得距离为$r$转轴的转动惯量
+##### 8.2 积分变量变换
+- Jacobian: 计算老变量对新变量偏导的行列式的值,通过带入$dxdydz=|J|dtdudv$可以转换变量
+$$J[\frac{(x,y,z)}{(t,u,v)}]=\begin{bmatrix}\begin{array}{ccc}
+    \frac{\partial x}{\partial u} & \frac{\partial x}{\partial u} & \frac{\partial x}{\partial v} \\
+    \frac{\partial y}{\partial u} & \frac{\partial y}{\partial u} & \frac{\partial y}{\partial v} \\
+    \frac{\partial z}{\partial u} & \frac{\partial z}{\partial u} & \frac{\partial z}{\partial v}
+\end{array} \end{bmatrix}$$
+- 对于极坐标$dxdy=rdrd\theta$
+- 对于圆筒坐标,$dzdxdy=rdzdrd\theta$
+- 对于球坐标$dxdydz=\rho^2\sin\phi d\rho d\theta d\phi$
+### 9. 向量微积分
+##### 9.1 <u>向量场性质</u>
+- 定义: 对于自变量$\bold x$,函数$\bold F$的输出同样是个向量$\bold v=\bold F(\bold x)$,对于三维坐标系可以用$\bold F(x, y, z)=<P,Q,R>$ ($P, Q, R$分别是标量函数)描述$\bold F$
+- 旋度: 描述向量场沿以各个坐标轴为轴心旋转强度的向量,任何梯度向量的旋度是零向量$\text{curl}\ (\bigtriangledown \bold F)=\bold 0$
+$$\text{curl}\ \bold F=\bigtriangledown\times\bold F=\begin{vmatrix}\begin{array}{ccc}
+    \bold i & \bold j & \bold k \\
+    \frac{\partial}{\partial x} & \frac{\partial}{\partial y} & \frac{\partial}{\partial z} \\
+    P & Q & R
+\end{array} \end{vmatrix}=\text{curl}\ \bold F = \left(\frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y}\right)\bold i + \left(\frac{\partial R}{\partial y} - \frac{\partial Q}{\partial z}\right)\bold j + \left(\frac{\partial R}{\partial x} - \frac{\partial P}{\partial z}\right)\bold k$$
+- 散度: 描述向量场沿各个方向上发散的标量,任何旋度向量的散度为0: $\text{div}\ \text{curl} \bold F=0$
+$$\text{div}\ \bold F=\frac{\partial P}{\partial x}+\frac{\partial Q}{\partial y}+\frac{\partial R}{\partial z}$$
+##### 9.2 <u>格林公式/斯托克斯定理</u>
+- 格林公式: 二维平面中区域的向量场边界积分等于散度面积分
+$$ \oint_C (Pdx + Qdy)=\iint\frac{\partial Q}{\partial x}-\frac{\partial P}{\partial y}dxdy $$
+- 斯托克斯定理: 格林公式的一般形式,向量场沿边界$C$线积分等于旋度向量的通量
+$$\oint_C\bold F\cdot d\bold r=\iint\text{curl}\ F\cdot d\bold S$$
+- 用旋度计算面积: 构造旋度向量为单位向量$\bold k$的向量场进行线积分来计算面积
+$$A=\oint x\mathrm dy=-\oint ydx=\frac{1}{2}\oint xdy-ydx$$
+##### 9.3 散度定理
+- 格林公式散度形式: 二维平面中任何区域的向量场沿边界$C$的法向积分等于散度的面积分
+$$\oint_C\bold F\cdot \bold nds=\iint\text{div}\ FdA$$
+- 散度定理: 格林公式散度形式的一般形式,任何区域内的向量场通量等于散度的体积分
+$$\iint_S\bold F\cdot\bold S=\iiint_V\text{div}\ FdV$$
+- 散度可以沿各个方向计算,并且在各个方向上服从散度定理
+$$\iint P\bold i\cdot\bold ndS=\iiint\frac{\partial P}{\partial x}dV$$
+### 10. 无穷级数
+##### 10.1 数列
 - 本质上就是从1开始,只在整数点$n$上有定义的函数$a_n=f(n)$
 - 数列的极限和函数类似,可以进行基础变换和夹逼定理
 - <u>单调有界数列必定收敛,但是收敛值可能并非区间边界</u>
-##### 6.2 <u>级数</u>
+##### 10.2 <u>级数</u>
 - 级数就是无穷数列的和$S=\sum_{n=1}^\infty a_n$
 - 如果级数收敛,则$\lim_{n\rightarrow\infty}a_n=0$,但<u>反之不成立</u>
 - 收敛级数加减后依然收敛,但是<u>各项相乘除后未必,只有幂级数肯定可以</u>
-##### 6.3 <u>收敛性判断</u>
+##### 10.3 <u>收敛性判断</u>
 - 积分检验: 如果$f_n\geq0$,则基于定义可以知道级数在它的积分下有界,因此如果下界发散则级数发散,下界收敛则级数收敛
 $$\int_0^\infty f(x)dx\leq S\leq\int_1^\infty f(x)dx$$
 - 对比检验: 对于两个都为正的级数$a_n$和$b_n$如果$a_i\geq b_i$且$b_n$发散,则$a_n$同样发散,如果$a_i\leq b_i$且$b_n$收敛,则$a_n$同样收敛,如果$\frac{a_i}{b_i}=c$,则两者性质相同
 - 摆动级数检验: 如果$a_n=(-1)^{n-1}b_n$且$b_n\geq 0$则$a是摆动数列$,如果$b_{n+1}\leq b_n$,并且$\lim_{n\rightarrow\infty}b_n=0$,则该数列收敛
 - 比值检验: 计算数列相邻两项之比$R=\lim_{n\rightarrow\infty}|\frac{a_{n+1}}{a_n}|,R<1$则收敛,$R>1$则发散,否则不确定
 - 根检验: 计算数列开$n$次根后的值$R=\lim_{n\rightarrow\infty}|\sqrt[n]{|a_n|}|,R<1$则收敛,$R>1$则发散,否则不确定
-##### 6.4 级数数值估计
+##### 10.4 级数数值估计
 - 定义余项$R_n$为级数在$n$项之后的和,如果余项有界,则这就是我们用前$n$项值代替级数真实值之后的误差,<u>余项只对收敛级数意义</u>
 $$R_n=S-S_n=\sum a_{n+1}+a_{n+2}+\cdots$$
 - 积分估计误差: 使用积分测试计算余项的上下界
 - <u>摆动数列估计误差</u>: $|R_n|\leq|a_{n+1}|$
-##### 6.5 条件收敛
+##### 10.5 条件收敛
 - 如果一个级数收敛,但是绝对值不收敛,则该技术是条件收敛
 - <u>条件收敛级数在调整顺序后,收敛值改变,并且可以通过调整期顺序使它收敛到任意实数</u>
-##### 6.6 <u>幂级数</u>
+##### 10.6 <u>幂级数</u>
 - 令函数$f(x)=\sum_{n=0}^\infty c_nx^n$,则$f(x)$是幂级数函数,定义域就是使其收敛的$x$范围
 - $f(x)$的收敛范围必定只有一个<u>连续区间</u>,区间长度可以是$0-\infty$中的任意值,但不可能出现两个断开的区间
 - 对幂级数求导/积分后得到的依然是幂级数,且收敛半径不变,但是收敛区间可能会改变
@@ -231,67 +353,42 @@ $$R_n=S-S_n=\sum a_{n+1}+a_{n+2}+\cdots$$
     |:--------:	|:---------------:	|:----------------:	|----------------------------------	|------------------------------	|-------------------	|-------------------------------	|
     | $a_n(x)$ 	|      $x^n$      	| $\frac{x^n}{n!}$ 	| $(-1)^n\frac{x^{2n+1}}{(2n+1)!}$ 	| $(-1)^n\frac{x^{2n}}{(2n)!}$ 	| $\binom{n}{k}x^n$ 	| $(-1)^n\frac{x^{2n+1}}{2n+1}$ 	|
     |  定义域  	|    $\|x\|<1$    	|   $\mathbb{R}$   	| $\mathbb{R}$                     	| $\mathbb{R}$                 	| $\|x\|<1$         	| $\|x\|<1$                     	|
-##### 6.7 泰勒级数
+##### 10.7 泰勒级数
 - 泰勒展开: 函数在$x$点的值可以通过无穷项在其他点$x_0$的导数和差值乘积之和计算,如果令$x_0=0$则又被称为麦克劳林级数
 $$f(x)=\sum_{k=0}^\infty\frac{f^k(x_0)(x-x_0)^k}{k!}+R(x-x_0)$$
 - 只有证明余项$R_n(x-x_0)$极限为0,才说明泰勒展开值等于函数值
 - <u>泰勒不等式</u>: 如果$n$阶导有界,$|f^{n+1}(x)|\leq M$,则余项同样有界$|R_n(x)|\leq\frac{M}{(n+1)!}|x-x_0|^{n+1}$,因为$\lim_{n\rightarrow\infty}\frac{x^n}{n!}=0$,所以通常找到$M$就可以说明余项有界
-### 7. 积分应用
-##### 7.1 线积分(弧长)
-- 将线分割成无数个小三角形的斜边,$x$和$y$分别是直角边
-$$L=\int_a^b\sqrt{1+[f'(x)]^2}dx$$
-- 参数坐标系下,可以将$dx$和$dy$用$dt$代换
-$$L=\int_\alpha^\beta\sqrt{(\frac{dx}{dt})^2+(\frac{dy}{dt})^2}\mathrm dt$$
-- 极坐标下可以将两条直角边理解成$rd\theta$和$dr$,并提出$\theta$
-$$L=\int\sqrt{1+(\frac{dr}{d\theta})^2}d\theta$$
-##### 7.2 面积分
-- 传统坐标系下,夹在两个函数$f(x),g(x)$中的面积为
-$$S=\int_a^bf(x)-g(x)dx$$
-- 用极坐标求扇形面积,可以把扇形分割成直角边分别为$r,rd\theta$的<u>小直角三角形</u>
-$$S=\int\frac{1}{2}r^2d\theta$$
-##### 7.3 体积表面积分
-- 旋转体的面积分,将表面积分割为若干个小圆筒,圆筒的半径为$f(x)$,高度是$dr$即弧长 (参数坐标系下同样可以用$dt$代换)
-$$S=\int_a^b2\pi f(x)dr=\int_a^bf(x)\sqrt{1+[f'(x)]^2}dx$$
-- 化简到斜边长为$l$的圆锥/椎体则有
-$$S=\int_a^b\pi(r_1+r_2)l$$
-##### 7.4 体积分
-- 套管体积分: 从内向外一圈一圈积 $V=\int_a^b2\pi xf(x)dx$
-##### 7.5 质心
-1. 质心是以质量分布为权重对位置求积分,可以在不同维度分别计算质心
-2. 令$f(x)$为物体在$y$轴上的厚度,则该部分的质量为$\rho f(x)dx$,可以得到在$x$轴上的质心
-$$M_x=\frac{\rho\int xf(x)dx}{\rho\int f(x)dx}$$
-3. Theorem of Pappus: 薄片围绕转动轴转一圈围成的体积等于薄片面积乘以质心转一圈后围成的弧长
-### 8. 一阶微分方程
-##### 8.1 <u>方向场</u>和欧拉法
+### 11. 一阶微分方程
+##### 11.1 <u>方向场</u>和欧拉方法
 1. 方向场借助导数图像帮助理解整个方程中$x$和$y$的性质
 2. 在坐标系中画出各个位置的导数方向,并通过画变动趋势线找到渐近线或者极点
 3. 欧拉法通过选取特定步长并记录$x$和$y$的变化,来迭代找到解
-##### 8.2 可分离方程
+##### 11.2 可分离方程
 - 可分离方程: 导数可以分解成$g(x)$和$=f(y)$的乘积/相除形式,通过将y和x移动到等式两边积分求解
 $$\frac{dy}{dx}=g(x)f(y)\rightarrow\int\frac{1}{f(y)}dy=\int g(x)dx$$
 - 自动方程: 可分离方程在$g(x)=1$的特殊形式,即$\frac{dy}{dx}=f(y)$
 - 自然增长率方程: 自动方程在$f(y)=ky$的特殊形式,此时解$y=\exp(kx)$
 - <u>Logistic方程</u>: 自动方程在$f(y)=ky(1-\frac{y}{R})$的特殊形式,此时解等于$y=\frac{R}{1+A\exp(-kx)}\quad A=\frac{k-y(0)}{y(0)}$
-##### 8.3一阶线性方程
+##### 11.3一阶线性方程
 在导数之外方程还有$y$的一次项,通过构造$I(x)$结合乘积定理求解
 $$\frac{dy}{dx}+P(x)y=Q(x)$$
 1. 找到满足$\frac{dI(x)}{dx}=I(x)P(x)$的$I(x)$,则有$\frac{dI(x)y}{dx}=\frac{dy}{dx}I(x)+I(x)P(x)y$
 $$I(x)=e^{\int P(x)dx}$$
 2. 在原等式两侧乘上$I(x)$并两边求积分可以得到新等式,代换后可以得到$y$
 $$I(x)y=\int I(x)Q(x)dx+C$$
-### 9. 二阶微分方程
-##### 9.1 齐次微分方程
+### 12. 二阶微分方程
+##### 12.1 齐次微分方程
 - 等式左侧$y$的次数最高为1,系数都为$x$的函数,<u>等式右边为0</u>
 $$P(x)\frac{d^2y}{dx^2}+Q(x)\frac{dy}{dx}+R(x)y=0$$
 - 齐次微分方程的通解$y_1(x),y_2(x)$的线性组合$c_1y_1(x)+c_2y_2(x)$之和都是方程的解
-##### 9.2 <u>常系数齐次方程</u>
+##### 12.2 <u>常系数齐次方程</u>
 - $P(x),Q(x),R(x)$分别为常数,因此方程可以写成$ay''+by'+cy=0$
 - $y(x)$的形式为指数函数,可以是$xe^{rx}$或$e^{rx}$,提取后可以获得<u>伴随方程</u>$ar^2+br+c=0$
 $$(ar^2+br+c)e^{rx}=0$$
 - 如果$r_1,r_2$分别为两个不相等的实根,则解为$y(x)=c_1e^{r_1x}+c_2e^{r_2x}$
 - 如果只有$r$作为重根,则解为$y(x)=c_1e^{rx}+c_2xe^{rx}$
 - 如果$r_1,r_2$分别为两个不等虚根,则解为$y(x)=e^{\alpha x}(c_1\sin\beta x+c_2\cos\beta x)$,$\alpha=\frac{r_1+r_2}{2},\beta=\frac{r_1-r_2}{2i},c_2$是虚数
-##### 9.3 <u>常系数非齐次方程</u>
+##### 12.3 <u>常系数非齐次方程</u>
 - 非齐次方程的解$y$可以写成特解$y_p$和对应齐次方程通解$y_c$之和的形式$y(x)=y_p(x)+y_c(x)$
 - 待定系数法求特解: $P(x),Q(x),R(x)$为相同阶数的$n$阶多项式,带入原方程匹配系数求解
   - 如果等式右侧$G(x)=e^{kx}P(x)$且$P(x)$,则特解$y_p$也有相同形式$y_p(x)=e^{kx}Q(x)$
@@ -306,41 +403,54 @@ $$(ar^2+br+c)e^{rx}=0$$
    $$u_1'y_1'+u_2'y_2'=G$$
    $$u_1'y_1+u_2'y_2=0$$
   4. 对$u_1'$和$u_2'$求积分获得$y_p$
-##### 9.4 级数法求多项式方程
+##### 12.4 级数法求多项式方程
 1. 通常在$P(x),Q(x),R(x),G(x)$都是多项式的时候有有效
 2. 用级数形式表示$y(x)=\sum_{n=0}^\infty c_nx^n$,并将$P(x)y(x)'',Q(x)y(x)'$都化简成$\sum_{n=i}^\infty c_nx^n$的级数形式
 3. 对每个$x^n$前的系数用待定系数法求解,移项后通常可以归纳出两个参数$c_0$和$c_1$
-### 10. 向量函数
-自变量只有一个$t$,应变量是多维向量,例如<$\bold x,\bold y,\bold z$>,有时候$x$可以直接作为$t$
-##### 10.1 常用向量公式
-| $\bold a\cdot\bold b$              	| $\text{comp}_{\bold a}\bold b$             	| $\text{proj}_{\bold a}\bold b$                       	| $\bold a\times\bold b$                                                  	| $\|\bold a\times\bold b\|$         	| $\bold a\cdot(\text{b}\times\text{c})$ 	| $\bold a\times\bold b\times\bold c$$             	|
-|--------------------------------------	|----------------------------------------------	|--------------------------------------------------------	|---------------------------------------------------------------------------	|--------------------------------------	|-----------------------------------------	|-----------------------------------------------------	|
-| $\|\bold a\|\|\bold b\|\cos\theta$ 	| $\frac{\bold a\cdot\bold b}{\|\bold a\|}$ 	| $\frac{\bold a\cdot\bold b}{\|\bold a\|^2}\bold a$ 	| $(a_2b_3-a_3b_2)\bold i-(a_1b_3-a_3b_1)\bold j+(a_1b_2-a_2b_1)\bold k$ 	| $\|\bold a\|\|\bold b\|\sin\theta$ 	| $(\bold a\times\bold b)\cdot\bold c$ 	| $\bold a\bold c\bold b-\bold a\bold b\bold c$ 	|
-##### 10.2 常用向量组合定义
-- 用加权得到连接$\bold r_0$和$\bold r_1$的线段
-$$\bold r(t)=(1-t)\bold r_0+t\bold r_1$$
-- 用参数方程定义经过$(x_0,y_0,z_0)$的曲线,$t$到$(x,y,z)$有唯一映射
-$$\frac{x-x_0}{a}=\frac{y-y_0}{b}=\frac{z-z_0}{c}=t$$
-- 用法向量<$a,b,c$>定义经过$(x_0,y_0,z_0)$的平面
-$$a(x-x_0)+b(y-y_0)+c(z-z_0)=0$$
-- 用二次多项式描述二次曲面,可以令$x,y,z$分量分别等于0来判断曲面在各个子平面中的性质
-##### 10.3 <u>向量微积分</u>
-- 向量函数连续,极限,导数,积分的定义和标量函数相同,只要在每个维度分别判断即可
-- 向量的叉乘,点乘,标量乘法,均服从常规标量的求导法则
-##### 10.4 <u>向量函数$\bold r(t)$的曲线性质</u>
-- 线积分(弧长):方法和标量函数相同,计算每个子线段$dr$和$dt$的关系
-$$L=\int |dr|=\int\sqrt{(\frac{dx}{dt})^2+(\frac{dy}{dt})^2+(\frac{dz}{dt})^2}dt$$
-- 切线单位向量: $\bold T=\frac{\bold r'}{|\bold r'|}$,由于$\bold T$的长度为1,因此$\bold T$和$\bold T'$垂直
-- 法向量: $\bold N=\frac{\bold T'}{|\bold T'|}$,即切线单位向量的梯度方向上的单位向量
-- 副法向量: $\bold B=\bold T\times N$,和$\bold T,\bold N$共同构造了在$\bold r(t)$的坐标系
-##### 10.5 曲率
-- 第一定义: 在$\bold r(t)$点内切圆的半径倒数: $\kappa=\frac{1}{R}$
-- 第二定义: 切线单位向量对弧长变化量的比值: $\kappa=|\frac{d\bold T}{d L}|=\frac{|\bold T'|}{|\bold r'|}$
-- 使用$\bold r'=|\bold r'|\bold T$定义求导后带入获得叉乘表示$\kappa=\frac{|\bold r'\times \bold r''|}{|\bold r'|^3}$,对于标量函数$\kappa=\frac{|f''|}{(1+f'^2)^{2/3}}$
-##### 10.6 加速度分解
-- 加速度$\bold a$可以分解成沿速度分量$v'\bold T$和垂直速度分量$\kappa v^2\bold N$,<u>曲率越大,速度越快,垂直加速度也越快</u>
-$$\bold a=v'\bold T+\kappa v^2\bold N=\frac{|\bold r'\cdot \bold r''|}{||\bold r'(t)||}\bold T+\frac{|\bold r'\times \bold r''|}{||\bold r'(t)||}\bold N$$
-- 当加速度$\bold a$和位移$\bold r$平行时,常用的做法就是让位移和速度叉乘后求导$\frac{d}{dt}(\bold r\times \bold v)=\bold 0$,可以得到$\bold r\times \bold v$是个常量$\bold h$
-### 11. 多变量微分
-### 12. 多变量积分
-### 13. 向量微积分
+### 13. <u>积分应用</u>
+##### 13.1 标量函数线积分
+- 将线分割成无数个小三角形的斜边,$x$和$y$分别是直角边(当$g(x)=1$时积分结果就是弧长)
+$$L=\int_a^b g(x)\sqrt{1+[f'(x)]^2}dx$$
+- 参数坐标系下,可以将$dx$和$dy$用$dt$代换
+$$L=\int_\alpha^\beta g(x)\sqrt{(\frac{dx}{dt})^2+(\frac{dy}{dt})^2}\mathrm dt$$
+- 沿特定坐标轴方向的积分
+$$L=\int_\alpha^\beta g(x)\frac{dx}{dt}\mathrm dt$$
+- 极坐标下可以将两条直角边理解成$rd\theta$和$dr$,并提出$\theta$
+$$L=\int\sqrt{1+(\frac{dr}{d\theta})^2}d\theta$$
+##### 13.2 <u>向量线积分</u>
+1. 用参数方程$[x(t), y(t)]$描述要积分的路径,则$d\bold r=<\frac{dx}{dt}dt,\frac{dy}{dt}dt>$
+2. 向量线积分就是对$\bold F(x,y)$在路径上积分
+$$\int_{t_0}^{t_1}\bold F(x(t), y(t))d\bold r=\int_{t_0}^{t_1}\bold F(x(t), y(t))\cdot<\frac{dx}{dt},\frac{dy}{dt}>dt$$
+3. 对于沿特定坐标轴的积分,例如$x$轴,直接令$\frac{dy}{dx}=0$即可
+4. 因为是向量点乘,积分结果和方向有关
+##### 13.3 <u>保守向量场</u>
+- $\int\bold F\cdot d\bold r$的结果和路径无关,任何环路的积分为0
+- 因为保守场环路积分为0,因此根据格林公式,环路中的旋度$\text{curl}\ \bold F$始终为$\bold 0$
+$$\frac{\partial Q}{\partial x}=\frac{\partial P}{\partial y}, \frac{\partial Q}{\partial z}=\frac{\partial R}{\partial y}, \frac{\partial P}{\partial z}=\frac{\partial R}{\partial x}$$
+##### 13.4 标量面积分
+- 传统坐标系下,夹在两个函数$f(x),g(x)$中的面积为
+$$S=\int_a^bf(x)-g(x)dx$$
+- 用极坐标求扇形面积,可以把扇形分割成直角边分别为$r,rd\theta$的<u>小直角三角形</u>
+$$S=\int\frac{1}{2}r^2d\theta$$
+##### 13.5 体积表面积分
+- 旋转体的面积分,将表面积分割为若干个小圆筒,圆筒的半径为$f(x)$,高度是$dr$即弧长 (参数坐标系下同样可以用$dt$代换)
+$$S=\int_a^b2\pi f(x)dr=\int_a^bf(x)\sqrt{1+[f'(x)]^2}dx$$
+- 化简到斜边长为$l$的圆锥/椎体则有
+$$S=\int_a^b\pi(r_1+r_2)l$$
+##### 13.6 <u>向量场通量积分</u>
+- 对于通过$u,v$作为参数描述的曲面$x(u,v),y(u,v),z(u,v)$,可以用叉乘形式计算表面积,本质是法向量的通量
+$$A=\iint |<x_u,y_u,z_u>\times<x_v,y_v,z_v>|dA$$
+- 令$u=x,v=y,z=f(x,y)$带入,可以化简为$\iint\sqrt{1+f_x^2+f_y^2}dA$
+- 令$g(u,v)$作为需要积分的向量,带入上式积分,则可以获得沿表面积的积分(当$g(u,v)=1$时计算的就是面积)
+$$A=\iint g(u,v)|<x_u,y_u,z_u>\times<x_v,y_v,z_v>|dA$$
+- 通量就是向量场沿法向量$\bold n=\frac{<x_u,y_u,z_u>\times<x_v,y_v,z_v>}{|<x_u,y_u,z_u>\times<x_v,y_v,z_v>|}$的积分
+$$\text{flux}=\iint\bold F\cdot\bold nds=\iint\bold F\cdot(<x_u,y_u,z_u>\times<x_v,y_v,z_v>)dA$$
+- 令$u=x,v=y,z=f(x,y)$,并且$\bold F=<P, Q, R>$,则通量可以化简为
+$$\text{flux}=\iint(-P\frac{\partial g}{\partial x}-Q\frac{\partial g}{\partial y}+R)dA$$
+##### 13.5 体积分
+- 套管体积分: 从内向外一圈一圈积 $V=\int_a^b2\pi xf(x)dx$
+##### 13.6 质心
+- 质心是以质量分布为权重对位置求积分,可以在不同维度分别计算质心
+- 令$f(x)$为物体在$y$轴上的厚度,则该部分的质量为$\rho f(x)dx$,可以得到在$x$轴上的质心
+$$M_x=\frac{\rho\int xf(x)dx}{\rho\int f(x)dx}$$
+- Theorem of Pappus: 薄片围绕转动轴转一圈围成的体积等于薄片面积乘以质心转一圈后围成的弧长
