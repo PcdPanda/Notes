@@ -34,6 +34,17 @@
         - [6.2 Foreign Bonds](#62-foreign-bonds)
         - [6.3 Emerging Market Bonds](#63-emerging-market-bonds)
         - [6.4 Stable Value Investments (Guaranteed Investment Contract)](#64-stable-value-investments-guaranteed-investment-contract)
+    - [6. Mortage-Backed Securities](#6-mortage-backed-securities)
+        - [6.1 Mortage Overview](#61-mortage-overview)
+        - [6.2 Agency MBS](#62-agency-mbs)
+        - [6.3 Collateralized Mortage Market](#63-collateralized-mortage-market)
+        - [6.4 Subprime ABS](#64-subprime-abs)
+        - [6.5 Commerical Mortage Backed Securities (CMBS)](#65-commerical-mortage-backed-securities-cmbs)
+    - [7. Other Asset Backed Securities](#7-other-asset-backed-securities)
+        - [7.1 Credit Card ABS](#71-credit-card-abs)
+        - [7.2](#72)
+        - [7.3](#73)
+        - [7.4](#74)
 
 # Handbook of Fixed Income
 ### 1. 固定收益市场概述
@@ -226,3 +237,54 @@ $$1+名义利率=(1+真实利率)\cdot(1+通胀率)$$
 - Separate Account GIC: 资产和发行方用分开的账户管理,确保即使发行方倒闭合约价值也不会受到影响。
 - Synthetic GIC (Wrapped Agreement): 投资者把资产存入作为保险对象的同时依然维持资产所有权并从原资产上获得收益,资产也可以是现金以外的其他证券,因此GIC的浮动价值也有久期等性质。
 - Buy-and-Hold Synthetics: 合约提供对应资产的收益率,但是投资者必须持有合约到期,通常发行方是一个团体来共担风险。
+### 6. Mortage-Backed Securities
+##### 6.1 Mortage Overview
+- 借款人使用房子作为抵押获得购房贷款,如果违约房子就会被收回,通常贷款期限$T$为30年,每月支付房贷。如果拖欠超过90天,则被定义为违约。
+- 房贷利率: 根据市场和投资人信用状况,$r$可以是固定的,或者在浮动利率LIBOR等指标上添加基差,可变利率房贷通常每年重设利率。
+- 影响投资人信用的因素:
+  
+| Credit Scores      | Loan-to-Value (LTV)               | Income Ratio   | Documentation                     |
+|--------------------|-----------------------------------|----------------|-----------------------------------|
+| 借款人的FICO Score | 贷款价值/抵押品市值(越低风险越低) | 收入占月供比例 | 证明信用的文档 |
+
+- 月供计算公式 $P=\text{Original\_Balance}\times\frac{r(1+r)^T}{(1+r)^T-1}$
+- <u>预付风险</u>:通常,借款人可以随时提前还清贷款,这给放贷人和投资人带来了预付风险,<u>因此MBS凸性为负</u>。
+  - Single Monthly Mortaility (SMM): 计算每个月贷款中被预付的比例 
+  - Conditional Prepayment Rate (CPR): 计算每年贷款中被预付的比例,可以计算为$CPR=1-(1-SMM)^{12}$
+  - <u>CPA模型</u>: SMM从0.2%开始,每个月上升0.2%,直到CPR达到6%后不变。CPR通常会在利率较低时升高,同时夏天也会更高,但在达到6%之后往往恢复稳定,因为剩下的借款人通常难以支付房贷。
+##### 6.2 Agency MBS
+- <u>运作方式</u>: 政府机构GSE从放贷人处购买房贷,并将相似的房贷打包成证券在市场上发售,信用程度甚至大于AAA债券。基于MBS的性质,本金和利息通常一起逐步偿还,而不是类似债券到期偿还。
+- WAC/WAM: MBS背后的各个房贷基于市值加权后保留的利率/期限,可以描述MBS的整体情况。
+- 市场传统: 交易员通常交易1个月后的远期MBS以便于对冲利率,同时使用360/30法计算利息,并用国债息差报价,最优的息差计算方式是基于现金流加权的。
+##### 6.3 Collateralized Mortage Market
+- 运作方式: 对MBS的现金流重组,基于支付期限和信用程度划分到不同的tranche,使得投资人可以更加灵活的配置风险和收益。
+- CMO结构:
+  - <u>Planned Amortized Class CMO (PAC)</u>: 基于预设的计划在不同的tranche中分配收入,并使用低等级tranche维护高级tranche收益的稳定性。
+  - <u>Sequential tranche CMO</u>: 只有高等级的tranche被完全支付之后才会支付低级tranche,因此高级tranche的收益波动更大,同时低级tranche的收益会减少。
+  - Targeted Amortization Class (TAC): 在PAC的基础上添加Call Protection,但是期权属性提高CMO在低预付率时的风险。
+- CMO不同的tranche:
+  - Z/Support Bond: 在CMO中作为最低的tranche吸收现金流波动,风险较大。Z Bond所有收益在CMO全部到期偿还,Support Bond则有分配计划。
+  - Very Accurately Determined Maturity (VADM): 基于借款人实际偿还本金的时间来支付收益,风险更大。
+  - Floater/Inverse Floater: 将CMO中固定收益的tranche基于浮动利率拆分,重组现金流使其对浮动利率有暴露。
+  - Interset/Principle Only Tranches: 只支付贷款者利息/本金的tranche。IO tranche希望高利率,PO反之希望高预付,可以帮助投资者控制风险暴露。
+- 信用评级: Agency CMO通常是AAA级,但是对于non-agency CMO,评级机构会参考底层MBS的资产类型,地理位置,贷款类型/规模/目的和发行放风险。通常non-agency CMO需要使用<u>信用增强<u>来CMO的信用。
+  - External Enhancement: 通过第三方机构提供担保.
+  - Internal Enhancement: 通过预设保留资金/次级tranche来吸纳风险。
+##### 6.4 Subprime ABS
+- 运作方式: 贷款来自于信贷记录不良的借款人,和其他MBS相关性低,且凸性更好。
+- 预付率: 预付率高,且上升速度快,因为借款人想要尽快提高自己的信用水平,因此预付率受利率影响低。
+- 信用增强: Subprime ABS采用PAC和Sequential CMO结合的方式,在前3年只有高级tranche可以获得本金收入,随后次级tranche才解禁,同时发行方还会进行拖欠和违约测试确保高级债券可靠性。
+##### 6.5 Commerical Mortage Backed Securities (CMBS)
+- 运作方式: 基于商业地产/酒店/厂房等设施发行的房贷,通常有10年的预付保护,因此主要风险在于违约。与传统MBS不同,<u>CMBS的大部分本金往往在到期日返还,借款人同时需要提供大量文件证明一次性还款能力。</u>
+- 信用增强: 通常一个CMBS包含不同地域,不同房产类别的房贷来降低风险,分散性指标必须大于压力测试阈值。
+- 风险特点: 通常必须在10年后才可以预付
+### 7. Other Asset Backed Securities
+##### 7.1 Credit Card ABS
+- 运作方式: 将信用卡债务基于Basic Master Trust Structure打包到收益池,再发行不同的tranches结合信用增强来满足不同的投资/评级需求。
+- 信用卡ABS市场:是流动性最强,规模最大的ABS产业,并且市场处于寡头垄断状态。在常规信用卡之外,还有商业公司开发特殊优惠的信用卡,或者只有特定场景可以使用的信用卡。
+- Revolving Period: 投资人在循环期只能获得信用卡的利息收益,因为此时本金收益被用作下一轮贷款。
+- Amortization Period: 改时段内,投资人会逐步获得信用卡借款的本金收益。如果遇到信用事件,则会提前开启分摊期。
+- 收益分配: 投资者收益是预先固定的收益率,剩余的收益属于发行者,并用来吸收投资波动。信用卡收益会先根据投资者/发行者打包,随后在循环期偿还利息,最后在分摊期完全返还收益。不同层级间,可以根据层级收益需求或预先设定的比例分配收益。
+##### 7.2
+##### 7.3
+##### 7.4
