@@ -9,8 +9,10 @@
         - [2.2 债券收益率计算](#22-债券收益率计算)
         - [2.3 利率风险,久期和凸性](#23-利率风险久期和凸性)
         - [2.4 利率结构分析](#24-利率结构分析)
-        - [2.5 基本的债券调仓策略](#25-基本的债券调仓策略)
-        - [2.6 实现收益率计算](#26-实现收益率计算)
+        - [2.5 拟合利率曲线](#25-拟合利率曲线)
+        - [2.6 带期权的债券定价](#26-带期权的债券定价)
+        - [2.7 基本的债券调仓策略](#27-基本的债券调仓策略)
+        - [2.8 实现收益率计算](#28-实现收益率计算)
     - [3. 政府发行证券](#3-政府发行证券)
         - [3.1 美国国债](#31-美国国债)
         - [3.2 地方债](#32-地方债)
@@ -45,6 +47,14 @@
         - [7.2 Automobile Lease Backed Securities](#72-automobile-lease-backed-securities)
         - [7.3 CDO](#73-cdo)
         - [7.4 Synthetic CDO](#74-synthetic-cdo)
+    - [8. Credit Analysis:](#8-credit-analysis)
+        - [8.1 Financial Analaysis:](#81-financial-analaysis)
+        - [8.2 Incomplete-Information Credit Models $(I^2)$](#82-incomplete-information-credit-models-i2)
+        - [8.3 Municipal Obligation and Revenue Bond](#83-municipal-obligation-and-revenue-bond)
+        - [8.4 Rating Agency Approach](#84-rating-agency-approach)
+    - [9. Bond Valuation](#9-bond-valuation)
+        - [OAS, OAD](#oas-oad)
+        - [Hedge Interest Rate Risk](#hedge-interest-rate-risk)
 
 # Handbook of Fixed Income
 ### 1. 固定收益市场概述
@@ -118,12 +128,27 @@ $$\text{Modified Duration}=\text{Macaulay Duration}\frac{1}{1+\text{YTM}/n}$$
   - 市场期望: 基于正确的远期利率期望出发,构造的长期利率
   - 时间风险溢价: 基于债券的beta/到期时间带来的风险,会受到投资者风险偏好的影响。<u>经济过热,利率曲线陡峭时会上升,在经济下挫,债券作为避险属性的情况下会下降,甚至为负数</u>。
   - 凸性偏好: 长期无权债券凸性很大,带来投资优势,在波动率高的市场会进一步放大,因此导致收益率降低。
-##### 2.5 基本的债券调仓策略
+##### 2.5 <u>拟合利率曲线</u>
+1. 使用零息债券获得现货利率,再结合现货利率获得远期利率,这种方法可以获得单点的利率
+2. 搭建利率模型
+   - Spline Cubic Models: 以时间为自变量,单点为分割的分段3次函数,使用OLS拟合函数系数,注意在单点必须可导。
+   - Svensson model: 拟合指数函数($\beta, c$)
+    $$r_f(t)=\beta_0+\beta_1\exp\frac{-t}{c_1}+\beta_2\frac{t}{c_1}\exp\frac{-t}{c_1}+\beta_3\frac{t}{c_2}\exp\frac{-t}{c_2}$$
+3. 分析拟合效果时要同时考虑精确度,可解释性和稳定性。
+4. 对冲利率风险: 计算整个投资组合对$\beta$的导数,使其尽可能等于0。如果只考虑利率的微小变化,那么只要使得久期和凸性为0即可。
+##### 2.6 <u>带期权的债券定价</u>
+1. 生成并校准利率变动路径: 选择合适的利率波动率,生成利率路径网,使得不同期限的零息债券在不同路径折现后的平均价格等于当前市场价
+2. 基于路径对债券定价: 基于上面生成的利率路径,对债券未来的现金流进行折现,如果债券包含期权,则会在对应时刻行权。
+3. 计算OAS:在利率路径上加上OAS息差对债券进行折现,OAS使得折现后的价格等于当前市场价。
+4. 计算OAD: 分别对考虑OAS之后的利率曲线进行上移和下移,随后重新计算债券价格,$OAD=\frac{P_-P_+}{2P_0\bigtriangleup r}$,OAC同理$\frac{P_-+P_+-2P_0}{2P_0(\bigtriangleup r)^2}$。
+5. 如果是类似MBS的复杂衍生品,还要考虑再融资利率等因素随利率的变动情况。
+6. <u>有效期限</u>:定义为利息率和久期相近的零息债券的期限。通常将有效期限和利息率相似的债券对比分析。 
+##### 2.7 基本的债券调仓策略
 - 流动性控制: 使用全收益分析找到和当前债券在评级,收益率等性质上相似的流动性强的债券来替换组合中的流动性差的债券。
 - 对未来利率预期/利差和市场不同,因此可以计算基于自己预期下的债券价格,并进行低买高卖。
 - 找到<u>远期利率中被错误定价</u>的部分,例如认为$t_1\sim t_2$期间利率定价过高,则可以通过做多$t_0\sim t_2$,做空$t_0\sim t_1$让自己仅暴露在$t_1\sim t_2$的利率变化中
 - 在利率曲线陡峭的时候进行<u>久期中性套利</u>: 在长期债券利率和中期利率近似的情况下,做空短期和长期利率,做多中期债券,在久期不变的情况下,提高综合收益率。
-##### 2.6 实现收益率计算
+##### 2.8 实现收益率计算
 - 流动性问题: 当因为流动性不好而无法对成分债券进行合理定价时,最好选择相似且流动性好的债券的价格替换。
 - 投资收益率: 可以考虑在投资阶段客户投入资金/取出资金对收益率的影响,但是没有具体考虑客户入金/出金的时点
 $$\text{ROI}=\frac{(\text{EndMarketValue}+\text{NetOutCash})-(\text{BeginMarketValue}+\text{NetInCash})}{\text{BeginMarketValue}+\text{NetInCash}}$$
@@ -134,6 +159,7 @@ $$\text{ROI}=\frac{(\text{EndMarketValue}+\text{NetOutCash})-(\text{BeginMarketV
   3. 用 Modiﬁed Dietz Return作为MWR的近似简便计算
     $$R=\frac{\text{EndMarketValue}-\text{BeginMarketValue}-\text{TotalNetCashFlow}}{\text{BeginMarketValue}+\sum n_i\cdot\text{NetCashFlow}_i}$$
 - <u>时间加权收益率 (TWR)</u>: 在每一次客户入金和出金的时候计算子区间收益率,并累成获得综合收益率。适合单独评估经理的投资表现,排除了客户的影响。在计算成本高的时候可以牺牲精度扩大子区间范围,并用子区间$MWR$近似。
+
 ### 3. 政府发行证券
 ##### 3.1 美国国债
 - T-bills: 1年内的到期,无利息,每周通过折价发行,报价习惯为年化折现率$Y=\frac{\text{Par}-\text{Price}}{\text{Par}}\cdot\frac{365}{t}$。
@@ -309,3 +335,24 @@ $$1+名义利率=(1+真实利率)\cdot(1+通胀率)$$
 - Funded SCDO(Credit-Linked Notes):投资者需要使用SPV购买抵押物来确保自己可以提供担保
 - ISDA:条款明确规定了信用事件的定义,同时设立了保证金和交割的标准化原则。
 - 投资原则: 关注CDO底层资产的违约相关率,确保不会同时违约造成大规模赔付,同时要尽量进行delta对冲。
+### 8. Credit Analysis:
+##### 8.1 Financial Analaysis:
+- 根据产业周期,公司财报,信用评级,杠杆率, ROE, Pretax interest coverage, EBITDA coverage和各项因素分析公司的违约概率,<u>通常要和同行业对比</u>。
+- 非财政因素: 监管,上游资源,成长空间和护城河,资本结构,国际贸易影响,行业竞争位置。
+- 财政因素: 杠杆率,固定和浮动收入,现金流支出,资产质量,分散程度,会计质量,债券安全性,资产流动性,经营杠杆率,营收规模。
+- High Yield: 适合用股票方法研究,分析杠杆,经营,护城河等因素,并常用MDA预测违约概率,<u>寻找因为评级滞后性导致的套利机会</u>。
+##### 8.2 <u>Incomplete-Information Credit Models $(I^2)$</u>
+1. 相对而言,该模型可以最精准地反应公司的现实,并且假定在时间周期内,只要公司的资产$A$小于D,即违约。
+2. 对公司间的$D$的covariance进行建模,并根据市场情况,实时更新当前$D$的分布,这样可以及时反映市场的突然变化。
+3. 假定公司价值$V$服从lognormal distribution,从股价和期权中可以反向得到波动率和asset value.
+4. 波动率或蒙特卡洛法对公司的资产$A$进行模拟,再减去$D$获得违约的概率。
+##### 8.3 Municipal Obligation and Revenue Bond
+- 分析债券的收入来源,索取收入的优先级,必须确保项目收入的增长比债务快。
+- 找清楚谁是真正的发行方以及开展项目的能力。
+##### 8.4 Rating Agency Approach
+- 抵押物分析: 主要考虑在违约情况下的回收率。
+- 现金流收入模型: 考虑次级债券结构,储备基金,超额抵押,额外利差是否可以为利息提供缓冲。
+- 对手方分析: 分析债券中的利息和违约条款,服务方转移现金流的能力,和抵押物资产的管理追评。
+### 9. <u>Bond Valuation</u>
+##### OAS, OAD
+##### Hedge Interest Rate Risk
