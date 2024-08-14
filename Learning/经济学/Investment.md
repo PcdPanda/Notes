@@ -776,40 +776,7 @@ $$
 
 - 有限责任公司: 公司的债权人获得股权和债务中价值较低的一项,对于股东来说,本质也是股权价值为$S$,债务价值为$X$的期权
 
-- 指数定期存款: 以牺牲常规利率$\frac{r_f-r_{min}}{1+Federal Home Loan Bank System
-The Federal Home Loan Bank System (FHLBank System) is a GSE established
-in 1932 to increase credit to the housing sector. It consists of 12 federally char-
-tered privately owned Federal Home Loan Banks that are charged with support-
-ing residential mortgage, small business, rural, and agricultural lending by over
-8,000 member-stockholder institutions. It does this by making loans to the mem-
-ber institutions, which in turn make loans to homebuyers, small businesses, and
-others. The Federal Housing Finance Board regulates the FHLBank System for
-mission, as well as safety and soundness issues.
-FHLBank debt issuance is conducted through the system’s ﬁscal agent, the
-Ofﬁce of Finance. The FHLBanks sell a variety of debt securities, including dis-
-count notes and medium-term notes. In July 1999, the FHLBanks initiated their
-own benchmark securities program called the Tap Issue Program. The program
-reopens coupon securities of four common maturities on a daily basis for three
-months via competitive auction. In 2003, the FHLBanks issued $5.7 trillion in debt
-securities, $5.2 trillion in short-term debt, and $569 billion in long-term debt. The
-FHLBanks had $719 billion in outstanding debt as of September 30, 2003.
-Farm Credit System
-The Farm Credit System (FCS) is a GSE established in 1916 to provide credit to
-the  agricultural  sector.  The  FCS  consists  of  four  Farm  Credit  Banks,  one
-Agricultural Credit Bank, and about 100 related Production Credit Associations,
-Federal Land Credit Associations, and Agricultural Credit Associations. Products
-and services offered by FCS institutions include real estate loans, operating loans,
-rural home mortgage loans, crop insurance, and various ﬁnancial services. The
-FCS is regulated by the Farm Credit Administration.
-The Federal Farm Credit Banks Funding Corporation is the system’s ﬁs-
-cal entity, providing funds to system institutions through the issuance of debt
-securities. The FCS issues discount notes, medium-term notes, and other debt
-securities. In March 1999, the FCS introduced its Designated Bonds program.
-The bonds are issued through a dealer syndicate with a minimum issue size of
-$1 billion and generally have a two- to ﬁve-year original maturity. In 2003, the
-FCS issued $310 billion in debt securities, $257 billion in short-term debt, and
-$53 billion in long-term debt. On September 30, 2003 the FCS had $90 billion
-in outstanding debt.r_f}$为代价,获得具有最低收益率$r_{min}$和$\frac{(r_f-r_{min})S_0}{(1+r_f)C}$倍指数上涨的收益的定期存款
+- 指数定期存款: 以牺牲常规利率$\frac{r_f-r_{min}}{1+r_f}$为代价,获得具有最低收益率$r_{min}$和$\frac{(r_f-r_{min})S_0}{(1+r_f)C}$倍指数上涨的收益的定期存款
 
 ##### <u>Black-Scholes欧式期权定价</u>
 
