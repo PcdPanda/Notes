@@ -836,7 +836,7 @@ $$
 - 期货合约: 和中心化交易所签订的标准化合约,同时具有提供确定性对冲风险和放大杠杆(5-10倍)的作用,交割比例只有1%-3%
 - 保证金杠杆率计算: 
   $$\text{Long Margin}=\frac{\text{Net Worth}}{\text{Asset Value}}\qquad\text{Short Margin}=\frac{\text{Net Worth}}{\text{Short Asset Value}}$$
-- 远期合约: 点对点的灵活合约,对手方风险高,交割比例远大于期货
+- 远期合约: 点对点的灵活合约,没有标准化,对手方风险高,交割比例远大于期货
 
 ##### 合约价格关系
 

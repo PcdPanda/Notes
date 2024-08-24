@@ -32,34 +32,39 @@
         - [5.5 回购计划](#55-回购计划)
         - [5.6 中期票据 (Midterm-Notes)](#56-中期票据-midterm-notes)
         - [5.7 优先股](#57-优先股)
-        - [5.8 可转债](#58-可转债)
     - [6. 另类债券](#6-另类债券)
         - [6.1 浮动利率债券 (Floating Rates Bond)](#61-浮动利率债券-floating-rates-bond)
         - [6.2 Foreign Bonds](#62-foreign-bonds)
         - [6.3 Emerging Market Bonds](#63-emerging-market-bonds)
         - [6.4 Stable Value Investments (Guaranteed Investment Contract)](#64-stable-value-investments-guaranteed-investment-contract)
-    - [7. 信用衍生品](#7-信用衍生品)
-        - [7.1 利率期货](#71-利率期货)
-        - [7.2 利率期权](#72-利率期权)
-        - [7.3 利率互换](#73-利率互换)
-        - [7.4 国债期货](#74-国债期货)
-        - [7.5 信用互换和衍生品](#75-信用互换和衍生品)
-    - [8. Mortage-Backed Securities](#8-mortage-backed-securities)
-        - [8.1 Mortage Overview](#81-mortage-overview)
-        - [8.2 Agency MBS](#82-agency-mbs)
-        - [8.3 Collateralized Mortage Market](#83-collateralized-mortage-market)
-        - [8.4 Subprime ABS](#84-subprime-abs)
-        - [8.5 Commerical Mortage Backed Securities (CMBS)](#85-commerical-mortage-backed-securities-cmbs)
-    - [9. Other Asset Backed Securities](#9-other-asset-backed-securities)
-        - [9.1 Credit Card ABS](#91-credit-card-abs)
-        - [9.2 Automobile Lease Backed Securities](#92-automobile-lease-backed-securities)
-        - [9.3 CDO](#93-cdo)
-        - [9.4 Synthetic CDO](#94-synthetic-cdo)
-    - [10. Credit Analysis:](#10-credit-analysis)
-        - [10.1 Financial Analaysis:](#101-financial-analaysis)
-        - [10.2 Incomplete-Information Credit Models $(I^2)$](#102-incomplete-information-credit-models-i2)
-        - [10.3 Municipal Obligation and Revenue Bond](#103-municipal-obligation-and-revenue-bond)
-        - [10.4 Rating Agency Approach](#104-rating-agency-approach)
+    - [7. 可转债](#7-可转债)
+        - [7.1 可转债定义](#71-可转债定义)
+        - [7.2 转换分析](#72-转换分析)
+        - [7.3 价值分析](#73-价值分析)
+        - [7.4 估值模型](#74-估值模型)
+        - [7.5 可转债变种](#75-可转债变种)
+    - [8. 信用衍生品](#8-信用衍生品)
+        - [8.1 利率期货](#81-利率期货)
+        - [8.2 利率期权](#82-利率期权)
+        - [8.3 利率互换](#83-利率互换)
+        - [8.4 国债期货](#84-国债期货)
+        - [8.5 信用互换和衍生品](#85-信用互换和衍生品)
+    - [9. Mortage-Backed Securities](#9-mortage-backed-securities)
+        - [9.1 Mortage Overview](#91-mortage-overview)
+        - [9.2 Agency MBS](#92-agency-mbs)
+        - [9.3 Collateralized Mortage Market](#93-collateralized-mortage-market)
+        - [9.4 Subprime ABS](#94-subprime-abs)
+        - [9.5 Commerical Mortage Backed Securities (CMBS)](#95-commerical-mortage-backed-securities-cmbs)
+    - [10. Other Asset Backed Securities](#10-other-asset-backed-securities)
+        - [10.1 Credit Card ABS](#101-credit-card-abs)
+        - [10.2 Automobile Lease Backed Securities](#102-automobile-lease-backed-securities)
+        - [10.3 CDO](#103-cdo)
+        - [10.4 Synthetic CDO](#104-synthetic-cdo)
+    - [11. Credit Analysis:](#11-credit-analysis)
+        - [11.1 Financial Analaysis:](#111-financial-analaysis)
+        - [11.2 Incomplete-Information Credit Models $(I^2)$](#112-incomplete-information-credit-models-i2)
+        - [11.3 Municipal Obligation and Revenue Bond](#113-municipal-obligation-and-revenue-bond)
+        - [11.4 Rating Agency Approach](#114-rating-agency-approach)
     - [11. Bond Portfolio Management](#11-bond-portfolio-management)
         - [11.1 Benchmark Selection](#111-benchmark-selection)
         - [11.2 Benchmark Tracing](#112-benchmark-tracing)
@@ -258,7 +263,6 @@ $$1+名义利率=(1+真实利率)\cdot(1+通胀率)$$
 - 分红率: 可以固定/基于标定利率浮动/以商业票据利率竞价,并且需要征税,但是税收相对较低,公司持有甚至可以免除70%的分红税,因此投资者几乎没有散户。
 - 分红风险: 无法提供分红不会使公司破产,而是让渡权利。此时基于条款决定未实现分红是否需要累积。
 - 沉没基金条款: 几乎所有优先股都有定期退役回购条款,可以通过现金或者支付普通股进行回购,此时会随机选择回购对象。
-##### 5.8 可转债
 ### 6. 另类债券
 ##### 6.1 浮动利率债券 (Floating Rates Bond)
 - 发行方式: <u>政府和企业都会发行</u>,通常利率由基准利率和额外利差共同决定,半年重置一次,同时利率可能存在浮动上下限以控制发债人的风险。
@@ -279,14 +283,43 @@ $$1+名义利率=(1+真实利率)\cdot(1+通胀率)$$
 - Separate Account GIC: 资产和发行方用分开的账户管理,确保即使发行方倒闭合约价值也不会受到影响。
 - Synthetic GIC (Wrapped Agreement): 投资者把资产存入作为保险对象的同时依然维持资产所有权并从原资产上获得收益,资产也可以是现金以外的其他证券,因此GIC的浮动价值也有久期等性质。
 - Buy-and-Hold Synthetics: 合约提供对应资产的收益率,但是投资者必须持有合约到期,通常发行方是一个团体来共担风险。
-### 7. 信用衍生品
-##### 7.1 利率期货
-##### 7.2 利率期权
-##### 7.3 利率互换
-##### 7.4 国债期货
-##### 7.5 信用互换和衍生品
-### 8. Mortage-Backed Securities
-##### 8.1 Mortage Overview
+### 7. 可转债
+##### 7.1 可转债定义
+- 转换价格/转换股数: 条款中规定了面值可以转换的股票数量或者股票价格,两者是对应的,但可能随着时间/拆股而改变。转换证券可以是发行方股权,等值债券,或者近似证券。
+- 债务属性: 通常是<u>次级债券</u>,破产时索赔顺序在普通债券之后。利息率通常大于股票分红利率,但收益率比常规债券低。
+- 股票期权属性: 当股票价值较高时,可转债和股票价格同涨同跌,但始终高于股权价值,同时还和股票的波动率正相关。
+- 债券期权属性: 大部分可转债发行方提前赎回权利,但通常前几年有赎回保护,发行方会为了鼓励持有者转换或者希望再融资使用赎回权。投资人有时候也有赎回权,但收益率会更低。
+##### 7.2 <u>转换分析</u> 
+- 转换比: 为了等于可转债面值所需要的当前股票数量,数量越低越好。
+- <u>转换平价 Conversion Parity</u>: 和可转债面值对应的股票价格,只有在股价超过转换溢价时才值得转换。
+- 转换溢价 Conversion Premium: 当前股价距离转换平价的距离,转换溢价比反应所需要的涨幅。
+- 价值溢价 Investment Premium: 可转债相对于债券价值的溢价,价值溢价比反应了溢价超出债券的比例。
+- <u>breakeven time</u>: 定义为<u>转换溢价比/(债券收益率-分红率)</u>,反应了持有可转债的回本时间,越短越可转债越有吸引力。具有参考价值,但只能用来评估发行方类似的可转债。
+##### 7.3 价值分析
+- 投资人往往在<u>看多波动率的情况下才会交易可转债</u>,而发行人往往认为公司业绩会相对稳定。
+- 可转债的价值通常由bond floor和股票的上行潜力共同决定,因此和其他资产相关性较低,可以提高夏普率。
+- 可转债理解成持有债券和股票期权,也可以理解成同时持有股票,转换成债券的期权以及分红利息掉期,但估值时不可以直接将各个资产价值相加。
+- 当股价较低时,bond floor和利率环境决定了可转债的价值,由于是次级债券,这时需要关注<u>信用风险</u>,可能要CDS对冲。
+- 当股价较高时,可转债主要由股权决定,此时delta几乎等于1。但是由于债务价值托底,在股价较低时波动率通常小于常规股票。
+##### 7.4 估值模型
+- 影响估值的变量有: 股价,股价波动率,利率,违约率,分红率,税务影响,赎回概率,期限,流动性,汇率,基本面价值等。
+- 因为变量太多,且PDE方程没有解析解,通常用有限微分法结合泰勒展开对PDE获得数值解。
+- 通常定义股价和利率为服从log-normal和均值回归分布的随机变量,对未来价值进行模拟。
+- 可以从当前市场期限结构,期权,CDS价格中得到未来利率,违约率,波动率的变化情况。
+##### 7.5 可转债变种
+- 常规可转债: 通常发行量在$50M以上,公开市场交易,具有3年的赎回保护期和5-10年的债券期限。有时候也会有面向私人市场的结构性产品。
+- 无息可转债(LYON/OID/PIK): 发行价格低于面值,转换的股数不变,转换价格会逐渐上升。OID属于LYON和常规可转债的折中产品,PIK则只有初期没有利息,但性质都相同。
+- <u>CoCo</u>: 只有当股价达到事先规定的要求时,投资人才有权利转换股票,有利于发行方,在美国很流行。
+- 可转优先股: 以优先股形式发行,但是可以转换常规股票。优先股的赔偿顺序在可转债更后,但是赎回保护更好。
+- 混合可转债: 以信托形式发行,在投资人方为优先股,但是在发行人方为债务,用于减少税务负担。
+### 8. 信用衍生品
+##### 8.1 利率期货
+##### 8.2 利率期权
+##### 8.3 利率互换
+##### 8.4 国债期货
+##### 8.5 信用互换和衍生品
+### 9. Mortage-Backed Securities
+##### 9.1 Mortage Overview
 - 借款人使用房子作为抵押获得购房贷款,如果违约房子就会被收回,通常贷款期限$T$为30年,每月支付房贷。如果拖欠超过90天,则被定义为违约。
 - 房贷利率: 根据市场和投资人信用状况,$r$可以是固定的,或者在浮动利率LIBOR等指标上添加基差,可变利率房贷通常每年重设利率。
 - 影响投资人信用的因素:
@@ -300,11 +333,11 @@ $$1+名义利率=(1+真实利率)\cdot(1+通胀率)$$
   - Single Monthly Mortaility (SMM): 计算每个月贷款中被预付的资金比例 
   - Conditional Prepayment Rate (CPR): 计算每年贷款中被预付的比例,可以计算为$CPR=1-(1-SMM)^{12}$
   - <u>CPA模型</u>: SMM从0.2%开始,每个月上升0.2%,直到CPR达到6%后不变。CPR通常会在利率较低时升高,同时夏天也会更高,但在达到6%之后往往恢复稳定,因为剩下的借款人通常难以支付房贷。
-##### 8.2 Agency MBS
+##### 9.2 Agency MBS
 - <u>发行方式</u>: 政府机构GSE从放贷人处购买房贷,并将相似的房贷打包成证券在市场上发售,信用程度甚至大于AAA债券。基于MBS的性质,本金和利息通常一起逐步偿还,而不是类似债券到期偿还。
 - WAC/WAM: MBS背后的各个房贷基于市值加权后保留的利率/期限,可以描述MBS的整体情况。
 - 市场传统: 交易员通常交易1个月后的远期MBS以便于对冲利率,同时使用360/30法计算利息,并用国债息差报价,最优的息差计算方式是基于现金流加权的。
-##### 8.3 Collateralized Mortage Market
+##### 9.3 Collateralized Mortage Market
 - 发行方式: 对MBS的现金流重组,基于支付期限和信用程度划分到不同的tranche,使得投资人可以更加灵活的配置风险和收益。
 - CMO结构:
   - <u>Planned Amortized Class CMO (PAC)</u>: 基于预设的计划在不同的tranche中分配收入,并使用低等级tranche维护高级tranche收益的稳定性。
@@ -318,28 +351,28 @@ $$1+名义利率=(1+真实利率)\cdot(1+通胀率)$$
 - 信用评级: Agency CMO通常是AAA级,但是对于non-agency CMO,评级机构会参考底层MBS的资产类型,地理位置,贷款类型/规模/目的和发行放风险。通常non-agency CMO需要使用<u>信用增强</u>来CMO的信用。
   - External Enhancement: 通过第三方机构提供担保.
   - Internal Enhancement: 通过预设保留资金/次级tranche来吸纳风险。
-##### 8.4 Subprime ABS
+##### 9.4 Subprime ABS
 - 发行方式: 同样是房贷,但是贷款来自于信贷记录不良的借款人,和其他MBS相关性低,且凸性更好。
 - 预付率: 预付率高,且上升速度快,因为借款人想要尽快提高自己的信用水平,因此预付率受利率影响低。
 - 信用增强: Subprime ABS采用PAC和Sequential CMO结合的方式,在前3年只有高级tranche可以获得本金收入,随后次级tranche才解禁,同时发行方还会进行拖欠和违约测试确保高级债券可靠性。
-##### 8.5 Commerical Mortage Backed Securities (CMBS)
+##### 9.5 Commerical Mortage Backed Securities (CMBS)
 - 发行方式: 基于商业地产/酒店/厂房等设施发行的房贷,通常有10年的预付保护,因此主要风险在于违约。与传统MBS不同,<u>CMBS的大部分本金往往在到期日返还,借款人同时需要提供大量文件证明一次性还款能力。</u>
 - 信用增强: 通常一个CMBS包含不同地域,不同房产类别的房贷来降低风险,分散性指标必须大于压力测试阈值。
 - 风险特点: 通常必须在10年后才可以预付
-### 9. Other Asset Backed Securities
-##### 9.1 Credit Card ABS
+### 10. Other Asset Backed Securities
+##### 10.1 Credit Card ABS
 - 发行方式: 将信用卡债务基于Basic Master Trust Structure打包到收益池,再发行不同的tranches结合信用增强来满足不同的投资/评级需求。
 - 信用卡ABS市场:是流动性最强,规模最大的ABS产业,并且市场处于寡头垄断状态。在常规信用卡之外,还有商业公司开发特殊优惠的信用卡,或者只有特定场景可以使用的信用卡。
 - Revolving Period: 投资人在循环期只能获得信用卡的利息收益,因为此时本金收益被用作下一轮贷款。
 - Amortization Period: 改时段内,投资人会逐步获得信用卡借款的本金收益。如果遇到信用事件,则会提前开启分摊期。
 - 收益分配: 投资者收益是预先固定的收益率,剩余的收益属于发行者,并用来吸收投资波动。信用卡收益会先根据投资者/发行者打包,随后在循环期偿还利息,最后在分摊期完全返还收益。不同层级间,可以根据层级收益需求或预先设定的比例分配收益。
-##### 9.2 Automobile Lease Backed Securities
+##### 10.2 Automobile Lease Backed Securities
 - 发行方式: 购车者找到dealer购车,dealer负责帮助购车人找到银行申请车贷。可靠的dealer申请贷款的历史成功率也高。
 - Absolute Prepayment Rate: 计算年化的被预付的车贷数量,预付率通常取决于消费者行为和经济周期。
 - 车贷几乎不会受到利率影响,因为借贷者不会再融资购车。
 - 信用风险: 放贷人会根据贷款人的信用分发行贷款,如果债务拖欠并违约,车辆将会被前行拍卖。
 - 低LTV: 由于车辆贬值较快,放贷人不会提供等于车辆当前价值的贷款,贷款人必须自己出资一部分。
-##### 9.3 <u>CDO</u>
+##### 10.3 <u>CDO</u>
 - 发行方式: 将<u>不同类型的ABS资产</u>打包池化,再分成不同tranches出售。tranch的利率是浮动的,但是ABS往往固定,因此中间需要Rate Swap.
 - Balance sheet/Cash Flow CDO: 转移资产风险和固定收益,同时赚取手续费。Cash Flow CDO需要定期进行测试来计算在每一层tranche计算对上层的保护程度,只有超过一定阈值,才可以将收益发放给该tranch
   - Coverage Test: $\text{O/C Ratio}=\frac{\text{Total Par Value}}{\text{Current Tranche Par Value}+\text{All Above Tranche Par Value}}$
@@ -351,27 +384,27 @@ $$1+名义利率=(1+真实利率)\cdot(1+通胀率)$$
     2. 选择合适的底层ABS类别 
     3. 考虑整个投资组合中所有CDO在一起后的分散度。
     4. 关注预付概率高的CDO,可以显著提升收益。
-##### 9.4 <u>Synthetic CDO</u>
+##### 10.4 <u>Synthetic CDO</u>
 - 发行方式: 使用<u>CDS等衍生品作为抵押物打包池化。</u>因为投资者可以任意选择CDS,因此不需要manager,同时管理费用低,没有利率和融资成本。
 - Unfunded SCDO: 投资者为底层underlying提供保险,获得保费。如果信贷实践发生,则投资者需要提供担保支持,因此投资者需要有良好信用记录。
 - Funded SCDO(Credit-Linked Notes):投资者需要使用SPV购买抵押物来确保自己可以提供担保
 - ISDA:条款明确规定了信用事件的定义,同时设立了保证金和交割的标准化原则。
 - 投资原则: 关注CDO底层资产的违约相关率,确保不会同时违约造成大规模赔付,同时要尽量进行delta对冲。
-### 10. Credit Analysis:
-##### 10.1 Financial Analaysis:
+### 11. Credit Analysis:
+##### 11.1 Financial Analaysis:
 - 根据产业周期,公司财报,信用评级,杠杆率, ROE, Pretax interest coverage, EBITDA coverage和各项因素分析公司的违约概率,<u>通常要和同行业对比</u>。
 - 非财政因素: 监管,上游资源,成长空间和护城河,资本结构,国际贸易影响,行业竞争位置。
 - 财政因素: 杠杆率,固定和浮动收入,现金流支出,资产质量,分散程度,会计质量,债券安全性,资产流动性,经营杠杆率,营收规模。
 - High Yield: 适合用股票方法研究,分析杠杆,经营,护城河等因素,并常用MDA预测违约概率,<u>寻找因为评级滞后性导致的套利机会</u>。
-##### 10.2 <u>Incomplete-Information Credit Models $(I^2)$</u>
+##### 11.2 <u>Incomplete-Information Credit Models $(I^2)$</u>
 1. 相对而言,该模型可以最精准地反应公司的现实,并且假定在时间周期内,只要公司的资产$A$小于D,即违约。
 2. 对公司间的$D$的covariance进行建模,并根据市场情况,实时更新当前$D$的分布,这样可以及时反映市场的突然变化。
 3. 假定公司价值$V$服从lognormal distribution,从股价和期权中可以反向得到波动率和asset value.
 4. 波动率或蒙特卡洛法对公司的资产$A$进行模拟,再减去$D$获得违约的概率。
-##### 10.3 Municipal Obligation and Revenue Bond
+##### 11.3 Municipal Obligation and Revenue Bond
 - 分析债券的收入来源,索取收入的优先级,必须确保项目收入的增长比债务快。
 - 找清楚谁是真正的发行方以及开展项目的能力。
-##### 10.4 Rating Agency Approach
+##### 11.4 Rating Agency Approach
 - 抵押物分析: 主要考虑在违约情况下的回收率。
 - 现金流收入模型: 考虑次级债券结构,储备基金,超额抵押,额外利差是否可以为利息提供缓冲。
 - 对手方分析: 分析债券中的利息和违约条款,服务方转移现金流的能力,和抵押物资产的管理追评。
