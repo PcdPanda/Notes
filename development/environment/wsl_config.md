@@ -66,3 +66,44 @@ WantedBy=default.target
 勾选：使用最高权限运行（确保 WSL 能启动 systemd 服务）
 “在用户登录时” 或 “计算机启动时” 操作：启动程序 程序/脚本：`wsl`
 去掉“仅在使用交流电时启动”等限制 可勾选“如果失败，重新启动任务”
+
+4. 配置自动导入,编辑`~/.ipython/profile_default/startup/ipython_stub.py`
+    ```Python
+    class LazyStub(object):
+        """
+        A stub object that initializes itself upon first access.
+        The stub also replaces itself with the real object in
+        the IPython namespace.
+        """
+        def __init__(self, varname, preexec, evalstr):
+            self.varname = varname  # Variable name for the stub
+            self.preexec = preexec  # Code to be executed before initializing object
+            self.evalstr = evalstr  # Code to be evaluated to get object
+            self.obj = None
+
+        def _getobj(self):
+            obj = object.__getattribute__(self, 'obj')
+            if not obj:
+                preexec = object.__getattribute__(self, 'preexec')
+                evalstr = object.__getattribute__(self, 'evalstr')
+                varname = object.__getattribute__(self, 'varname')
+
+                ip = get_ipython()
+                ip.ex(preexec)
+                obj = ip.ev(evalstr)
+                setattr(self, 'obj', obj)
+                ip.push({varname: obj})
+            return obj
+
+        def __getattribute__(self, item):
+            obj = object.__getattribute__(self, '_getobj')()
+            return getattr(obj, item)
+
+    def lazy_obj(varname, preexec, evalstr):
+        ip = get_ipython()
+        stub = LazyStub(varname, preexec, evalstr)
+        ip.push({varname: stub})
+
+    lazy_obj('mktlib', 'from pcdtrade.data.market import MarketLib', 'MarketLib()')
+    ```
+
