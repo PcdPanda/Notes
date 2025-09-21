@@ -51,16 +51,17 @@ After=network.target
 [Service]
 Type=simple
 User=panda
-ExecStart=/bin/bash -c "source /home/panda/miniconda3/etc/profile.d/conda.sh && conda activate quant && /home/panda/miniconda3/envs/quant/bin/jupyter lab --no-browser --port=8888"
+ExecStart=/bin/bash -c "source /home/panda/.bashrc && /home/panda/miniconda3/bin/conda run -n quant jupyter lab --no-browser --port=8888"
 WorkingDirectory=/home/panda
 Restart=always
 
 [Install]
 WantedBy=default.target
 ```
+2. 注意在`.bashrc`里要把变量export放在开头,确保非交互式脚本环境变量可以生效
 
-2. 设置windows任务
-1. 打开 任务计划程序 → “创建任务”
+3. 设置windows任务
+打开 任务计划程序 → “创建任务”
 名称：WSL Auto Start
 勾选：使用最高权限运行（确保 WSL 能启动 systemd 服务）
 “在用户登录时” 或 “计算机启动时” 操作：启动程序 程序/脚本：`wsl`
