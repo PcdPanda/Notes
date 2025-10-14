@@ -22,9 +22,13 @@ chattr -f +i /etc/resolv.conf'
 ### 2. [全局设置](https://learn.microsoft.com/en-us/windows/wsl/wsl-config)
 
 ```shell
+# /etc/wsl.conf
 [boot]
 systemd=true  # Enable systemctl
+```
 
+```shell
+# "C:\Users\panch\.wslconfig"
 [wsl2]
 memory=12GB  # Larger memory
 swap=20GB
@@ -41,6 +45,16 @@ git config --global user.name "Panda"
 # Add token and import to github
 cd ~/.ssh && ssh-keygen
 ```
+配置.git/hooks/pre-commit
+```shell
+files=$(git diff --name-only --diff-filter=d HEAD | grep -E '\.pyi?$')
+if [ -n "$files" ]; then
+    echo ">>> Running format-python"
+    format-python $files
+    git add $files
+fi
+```
+
 
 ### 4. Jupyter Notebook自动启动
 1. 设置service
